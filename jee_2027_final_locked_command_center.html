@@ -1,0 +1,3107 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JEE 2027</title>
+  <!-- JEE Batcave SVG Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='2' y='2' width='60' height='60' rx='16' fill='%23090b10' stroke='%2338bdf8' stroke-width='3'/%3E%3Ctext x='32' y='35' dominant-baseline='middle' text-anchor='middle' fill='%23f8fafc' font-family='sans-serif' font-weight='800' font-size='23' letter-spacing='1'%3EJEE%3C/text%3E%3C/svg%3E" />
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- SheetJS for two-way .xlsx / .csv import & export -->
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    :root {
+      --bg-base: #050608;
+      --bg-surface: #090b10;
+      --bg-elevated: #0e1118;
+      --border-hairline: #191f2c;
+      --accent-glow: rgba(56, 189, 248, 0.05);
+      --accent-primary: #38bdf8;
+      --accent-highway: #38bdf8;
+    }
+
+    body.hw-theme {
+      --bg-base: #070406;
+      --bg-surface: #0d070a;
+      --bg-elevated: #140b0f;
+      --border-hairline: #29131b;
+      --accent-glow: rgba(239, 68, 68, 0.08);
+      --accent-primary: #ef4444;
+      --accent-highway: #ef4444;
+    }
+
+    body {
+      background-color: var(--bg-base);
+      background-image: radial-gradient(circle at 50% 0%, var(--accent-glow) 0%, transparent 58%);
+      color: #e2e8f0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -webkit-tap-highlight-color: transparent;
+      transition: background-color 0.35s ease, color 0.25s ease;
+    }
+
+    .bat-surface {
+      background-color: var(--bg-surface);
+      border-color: var(--border-hairline);
+      transition: background-color 0.35s ease, border-color 0.35s ease;
+    }
+
+    .bat-elevated {
+      background-color: var(--bg-elevated);
+      border-color: var(--border-hairline);
+      transition: background-color 0.35s ease, border-color 0.35s ease;
+    }
+
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg-base);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1e2534;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #2f3a52;
+    }
+
+    /* Batcave Focus Chamber Animations (Anti-Drift — Zero Ticking Numbers) */
+    @keyframes arcSweep {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    @keyframes arcSweepReverse {
+      0% { transform: rotate(360deg); }
+      100% { transform: rotate(0deg); }
+    }
+    @keyframes haloBreathe {
+      0%, 100% { transform: scale(0.94); opacity: 0.45; }
+      50% { transform: scale(1.06); opacity: 0.85; }
+    }
+    .focus-arc-cw {
+      transform-origin: center;
+      animation: arcSweep 28s linear infinite;
+    }
+    .focus-arc-ccw {
+      transform-origin: center;
+      animation: arcSweepReverse 19s linear infinite;
+    }
+    .focus-halo-breathe {
+      animation: haloBreathe 5.2s ease-in-out infinite;
+    }
+    .focus-grid-bg {
+      background-image: radial-gradient(rgba(148, 163, 184, 0.14) 1px, transparent 1px);
+      background-size: 28px 28px;
+      mask-image: radial-gradient(circle at 50% 45%, black 12%, transparent 72%);
+      -webkit-mask-image: radial-gradient(circle at 50% 45%, black 12%, transparent 72%);
+    }
+
+    @keyframes beaconPing {
+      0% { transform: scale(0.85); opacity: 0.75; }
+      70% { transform: scale(1.65); opacity: 0; }
+      100% { transform: scale(1.65); opacity: 0; }
+    }
+    .road-beacon-ping {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: beaconPing 2.2s cubic-bezier(0, 0, 0.2, 1) infinite;
+    }
+
+    @keyframes cardJumpFlash {
+      0% { box-shadow: 0 0 0 0 var(--accent-highway); }
+      40% { box-shadow: 0 0 0 3px var(--accent-highway); }
+      100% { box-shadow: 0 0 0 0 transparent; }
+    }
+    .road-card-flash {
+      animation: cardJumpFlash 1.3s ease-out;
+    }
+
+    /* Interactive Highway Drag Surface & 7s Press-and-Hold Exit Guard */
+    #highway-svg {
+      touch-action: none;
+    }
+    .exit-hold-btn {
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+  </style>
+</head>
+<body class="min-h-screen selection:bg-sky-500/20 selection:text-sky-200">
+
+  <!-- Toast Notification Stack -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- Hidden File Input for Excel / CSV Import -->
+  <input type="file" id="xlsx-file-input" accept=".xlsx,.xls,.csv" class="hidden" onchange="handleFileImport(event)" />
+
+  <!-- ======================================================================= -->
+  <!-- FOCUS LOCK OVERLAY (BATCAVE FOCUS CHAMBER — ZERO CLOCK/COUNTDOWN)       -->
+  <!-- ======================================================================= -->
+  <div id="lock-overlay" class="fixed inset-0 z-50 hidden flex-col justify-between bg-[#030407]/98 backdrop-blur-2xl p-5 sm:p-8 overflow-y-auto">
+    <!-- Subtle Subject Radial Ambient & Fading Tactical Dot Grid -->
+    <div id="lock-radial-glow" class="pointer-events-none absolute inset-0 opacity-40 transition-all duration-700"></div>
+    <div class="pointer-events-none absolute inset-0 focus-grid-bg opacity-50"></div>
+
+    <!-- Top Minimal Telemetry Header -->
+    <div class="relative z-10 max-w-2xl w-full mx-auto flex items-center justify-between gap-3">
+      <div class="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/[0.03] border border-white/[0.08] shadow-inner">
+        <span id="lock-subject-dot" class="w-2 h-2 rounded-full bg-sky-400 shadow-[0_0_8px_currentColor]"></span>
+        <span id="lock-subject-text" class="text-[11px] font-mono uppercase tracking-[0.14em] text-slate-200">PHYSICS · THEORY</span>
+      </div>
+
+      <span class="hidden sm:inline-flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-[0.18em] text-slate-500">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400/70"></span>
+        Single-Channel Lock
+      </span>
+
+      <button
+        id="lock-exit-hold-btn"
+        onpointerdown="startExitHold(event)"
+        onpointerup="cancelExitHold()"
+        onpointerleave="cancelExitHold()"
+        onpointercancel="cancelExitHold()"
+        oncontextmenu="return false;"
+        class="exit-hold-btn relative overflow-hidden px-4 py-1.5 rounded-full bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.1] text-slate-400 hover:text-slate-200 transition"
+      >
+        <span id="lock-exit-fill" class="pointer-events-none absolute inset-y-0 left-0 bg-gradient-to-r from-rose-600/50 to-rose-400/45" style="width: 0%;"></span>
+        <span id="lock-exit-label" class="relative z-10 font-mono text-[11px] tracking-wide">Hold 7s to Exit</span>
+      </button>
+    </div>
+
+    <!-- Center Luminous Obsidian Medallion & Mission Focus -->
+    <div class="relative z-10 max-w-xl w-full mx-auto flex flex-col items-center text-center my-auto py-8">
+      <!-- Sleek Concentric Horizon Medallion -->
+      <div class="relative w-40 h-40 sm:w-48 sm:h-48 flex items-center justify-center mb-9">
+        <!-- Ambient Breathing Glow -->
+        <div id="lock-ambient-halo" class="absolute inset-4 rounded-full blur-2xl focus-halo-breathe" style="background: rgba(56, 189, 248, 0.22);"></div>
+
+        <!-- Precision Azimuth & Sweeping Arc SVG -->
+        <svg class="w-full h-full relative z-10" viewBox="0 0 200 200">
+          <defs>
+            <filter id="lock-glow-filter" x="-30%" y="-30%" width="160%" height="160%">
+              <feGaussianBlur stdDeviation="3" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
+
+          <!-- Fine Instrument Degree Ring -->
+          <circle cx="100" cy="100" r="88" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1" />
+          <circle cx="100" cy="100" r="88" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="3" stroke-dasharray="1 14.35" />
+
+          <!-- Outer Luminous Sweeping Arc -->
+          <g class="focus-arc-cw">
+            <circle id="lock-ring-outer" cx="100" cy="100" r="76" fill="none" stroke="#38bdf8" stroke-width="2" stroke-dasharray="78 400" stroke-linecap="round" filter="url(#lock-glow-filter)" opacity="0.9" />
+          </g>
+
+          <!-- Inner Counter-Sweeping Hairline Arc -->
+          <g class="focus-arc-ccw">
+            <circle cx="100" cy="100" r="60" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1" />
+            <circle id="lock-ring-inner" cx="100" cy="100" r="60" fill="none" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="36 340" stroke-linecap="round" opacity="0.55" />
+          </g>
+        </svg>
+
+        <!-- Obsidian Glass Core Medallion -->
+        <div id="lock-core-orb" class="absolute z-20 w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-[#070a10]/90 border border-white/[0.1] shadow-[inset_0_1px_14px_rgba(255,255,255,0.06),0_12px_36px_rgba(0,0,0,0.85)] flex items-center justify-center">
+          <div class="w-9 h-9 rounded-full border border-white/[0.08] flex items-center justify-center">
+            <div id="lock-core-dot" class="w-2.5 h-2.5 rounded-full bg-sky-400 focus-halo-breathe shadow-[0_0_14px_currentColor]"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mode & High-Weightage Meta Pills -->
+      <div class="flex items-center justify-center gap-2 mb-3.5">
+        <span id="lock-mode-pill" class="px-3 py-1 rounded-full text-[11px] font-mono tracking-wide bg-white/[0.04] border border-white/[0.08] text-slate-300">
+          Full Top 500
+        </span>
+        <span id="lock-hw-badge" class="hidden px-2.5 py-1 rounded-full text-[10px] font-mono uppercase tracking-wider bg-red-500/15 border border-red-500/35 text-red-300">
+          High Weightage
+        </span>
+      </div>
+
+      <h2 id="lock-title" class="text-3xl sm:text-4xl font-semibold tracking-tight text-white leading-tight px-2">
+        Alternating Current
+      </h2>
+      <p id="lock-subtitle" class="text-xs sm:text-sm text-slate-400 mt-3 max-w-md leading-relaxed">
+        No tab-switching. Close this block cleanly before exiting lock.
+      </p>
+
+      <!-- Instant Theory-to-PYQ Follow-Up Prompt -->
+      <div id="lock-pyq-followup" class="hidden w-full mt-8 p-4 sm:p-5 rounded-2xl bg-emerald-500/[0.08] border border-emerald-400/30 backdrop-blur-md text-left shadow-2xl">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <p class="text-[11px] font-mono uppercase tracking-[0.14em] text-emerald-400">Theory Closed ✓</p>
+            <p id="lock-followup-text" class="text-sm font-medium text-white mt-1">Launch MUST DO PYQs right now while formulas are fresh?</p>
+          </div>
+          <div class="flex items-center gap-2 shrink-0">
+            <button onclick="launchFollowUpPyqs()" class="px-4 py-2.5 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-xs font-semibold text-slate-950 transition shadow-lg">
+              Start PYQs →
+            </button>
+            <button onclick="exitFocusLock()" class="px-3.5 py-2.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] border border-white/10 text-xs font-medium text-slate-200 transition">
+              Return
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sleek Glassmorphic Bottom Completion Dock -->
+    <div id="lock-actions-bar" class="relative z-10 max-w-lg w-full mx-auto p-2 rounded-2xl bg-white/[0.03] border border-white/[0.08] backdrop-blur-md flex flex-col sm:flex-row items-center gap-2 shadow-2xl">
+      <button id="lock-primary-btn" onclick="completeLockedTask()" class="w-full sm:flex-1 py-3.5 px-6 rounded-xl bg-sky-400 hover:brightness-110 text-sm font-semibold text-slate-950 transition shadow-lg">
+        Mark Completed ✓
+      </button>
+      <button id="lock-defer-btn" onclick="deferLockedTask()" class="w-full sm:w-auto py-3.5 px-5 rounded-xl bg-white/[0.04] hover:bg-white/[0.09] border border-white/[0.08] text-xs font-medium text-slate-300 hover:text-white transition">
+        Pin to Tomorrow
+      </button>
+    </div>
+  </div>
+
+  <!-- ======================================================================= -->
+  <!-- FULL TEST SCORE LOGGER MODAL                                            -->
+  <!-- ======================================================================= -->
+  <div id="score-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/75 backdrop-blur-sm p-4">
+    <div class="w-full max-w-md rounded-2xl bat-surface border p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <span class="text-[11px] font-mono uppercase tracking-wider text-purple-400">Full Test Telemetry</span>
+          <h3 id="score-modal-title" class="text-base font-semibold text-white mt-0.5">Log Mock Score</h3>
+        </div>
+        <button onclick="closeScoreModal()" class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition">✕</button>
+      </div>
+
+      <input type="hidden" id="score-test-id" />
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-[11px] font-mono text-slate-400 mb-1">Test Name</label>
+          <input id="score-test-name" type="text" placeholder="e.g. QFT-1" class="w-full px-3 py-2 rounded-xl bat-elevated border text-xs text-white focus:outline-none focus:border-purple-400" />
+        </div>
+        <div>
+          <label class="block text-[11px] font-mono text-slate-400 mb-1">Date</label>
+          <input id="score-test-date" type="date" class="w-full px-3 py-2 rounded-xl bat-elevated border text-xs text-white focus:outline-none focus:border-purple-400" />
+        </div>
+      </div>
+
+      <div class="grid grid-cols-3 gap-2.5">
+        <div>
+          <label class="block text-[11px] font-mono text-sky-400 mb-1">Physics /100</label>
+          <input id="score-phy" type="number" min="-25" max="100" oninput="autoSumModalScore()" placeholder="0" class="w-full px-3 py-2 rounded-xl bat-elevated border text-xs font-mono text-white focus:outline-none focus:border-sky-400" />
+        </div>
+        <div>
+          <label class="block text-[11px] font-mono text-emerald-400 mb-1">Chem /100</label>
+          <input id="score-chem" type="number" min="-25" max="100" oninput="autoSumModalScore()" placeholder="0" class="w-full px-3 py-2 rounded-xl bat-elevated border text-xs font-mono text-white focus:outline-none focus:border-emerald-400" />
+        </div>
+        <div>
+          <label class="block text-[11px] font-mono text-amber-400 mb-1">Maths /100</label>
+          <input id="score-math" type="number" min="-25" max="100" oninput="autoSumModalScore()" placeholder="0" class="w-full px-3 py-2 rounded-xl bat-elevated border text-xs font-mono text-white focus:outline-none focus:border-amber-400" />
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between px-3.5 py-2.5 rounded-xl bat-elevated border">
+        <span class="text-xs text-slate-400">Total Score (/300)</span>
+        <input id="score-total" type="number" min="-75" max="300" class="w-24 text-right bg-transparent font-mono text-base font-semibold text-purple-300 focus:outline-none" />
+      </div>
+
+      <div>
+        <label class="block text-[11px] font-mono text-slate-400 mb-1">1-Line Takeaway / Error Fix</label>
+        <input id="score-note" type="text" placeholder="e.g. Accuracy 84%, silly calc slip in Rotation" class="w-full px-3 py-2 rounded-xl bat-elevated border text-xs text-white focus:outline-none focus:border-purple-400" />
+      </div>
+
+      <div class="flex justify-end gap-2 pt-2">
+        <button onclick="closeScoreModal()" class="px-3.5 py-2 rounded-xl bat-elevated border text-xs font-medium text-slate-300 hover:text-white transition">
+          Cancel
+        </button>
+        <button onclick="saveTestScore()" class="px-4 py-2 rounded-xl bg-purple-500 hover:bg-purple-400 text-xs font-semibold text-slate-950 transition">
+          Save Score ✓
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================= -->
+  <!-- FULL TEST SCORE GRAPH MODAL                                             -->
+  <!-- ======================================================================= -->
+  <div id="graph-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+    <div class="w-full max-w-2xl rounded-2xl bat-surface border p-5 sm:p-6 shadow-2xl space-y-4">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <span class="text-[11px] font-mono uppercase tracking-wider text-purple-400">Performance Trajectory</span>
+          <h3 class="text-base font-semibold text-white mt-0.5">Full Test Score Progression</h3>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="inline-flex p-1 rounded-xl bat-elevated border">
+            <button onclick="setGraphMode('total')" id="graph-mode-total" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-purple-500/20 text-purple-300 transition">
+              Total /300
+            </button>
+            <button onclick="setGraphMode('pcm')" id="graph-mode-pcm" class="px-2.5 py-1 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition">
+              P · C · M /100
+            </button>
+          </div>
+          <button onclick="closeScoreGraph()" class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition">✕</button>
+        </div>
+      </div>
+
+      <!-- Summary Pills -->
+      <div id="graph-stats-bar" class="grid grid-cols-2 sm:grid-cols-4 gap-2.5"></div>
+
+      <!-- SVG Chart Container -->
+      <div id="graph-svg-container" class="w-full rounded-xl bat-elevated border p-3 sm:p-4 overflow-hidden"></div>
+    </div>
+  </div>
+
+  <!-- ======================================================================= -->
+  <!-- RESET CONFIRMATION MODAL                                                -->
+  <!-- ======================================================================= -->
+  <div id="reset-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/75 backdrop-blur-sm p-4">
+    <div class="w-full max-w-md rounded-2xl bat-surface border p-6 shadow-2xl">
+      <h3 class="text-base font-semibold text-white">Restore Nov 22 Baseline Snapshot?</h3>
+      <p class="text-xs text-slate-400 mt-2 leading-relaxed">
+        Resets all 81 chapters back to your November 22 baseline (9 Exam Ready, 35 Theory Done, AC Theory Ongoing) and clears local changes.
+      </p>
+      <div class="flex justify-end gap-2.5 mt-5">
+        <button onclick="closeResetModal()" class="px-3.5 py-2 rounded-xl bat-elevated border text-xs font-medium text-slate-300 hover:text-white transition">
+          Cancel
+        </button>
+        <button onclick="confirmReset()" class="px-3.5 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-xs font-semibold text-white transition">
+          Restore Snapshot
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================= -->
+  <!-- MINIMAL STICKY HEADER                                                   -->
+  <!-- ======================================================================= -->
+  <header class="sticky top-0 z-30 bg-[#050608]/90 backdrop-blur-md border-b border-[#191f2c]">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-2">
+      <!-- Subtle JEE 2027 Brand + Date -->
+      <div class="flex items-center gap-2.5 min-w-0">
+        <span class="text-sm font-semibold tracking-tight text-white truncate">JEE 2027</span>
+        <span class="text-slate-700">·</span>
+        <span id="header-date-sub" class="text-xs font-mono text-slate-400 truncate">Sun, Nov 22</span>
+      </div>
+
+      <!-- Center Segmented Navigation -->
+      <div class="inline-flex p-1 rounded-xl bat-elevated border" role="tablist">
+        <button onclick="switchView('today')" id="nav-today" class="px-3 py-1 rounded-lg text-xs font-semibold bg-white/10 text-white transition">
+          Today
+        </button>
+        <button onclick="switchView('roadmap')" id="nav-roadmap" class="px-3 py-1 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition">
+          Roadmap
+        </button>
+        <button onclick="switchView('syllabus')" id="nav-syllabus" class="px-3 py-1 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition">
+          Syllabus
+        </button>
+      </div>
+
+      <!-- Right Compact Progress Pill + Sync Dropdown -->
+      <div class="flex items-center gap-2 shrink-0">
+        <div id="nav-meter-compact" class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bat-elevated border text-[11px] font-mono text-slate-300">
+          9/81 Ready
+        </div>
+
+        <div class="relative">
+          <button onclick="toggleSyncMenu(event)" class="px-2.5 py-1 rounded-lg bat-elevated hover:bg-white/[0.06] border text-xs font-medium text-slate-300 hover:text-white transition inline-flex items-center gap-1.5">
+            <span>Sync</span>
+            <span id="sync-diff-badge" class="hidden px-1.5 py-0.2 rounded-full bg-sky-500/20 text-sky-300 font-mono text-[10px]">0</span>
+            <span class="text-[10px] text-slate-500">▾</span>
+          </button>
+
+          <div id="sync-dropdown" class="hidden absolute right-0 mt-2 w-56 rounded-2xl bat-surface border shadow-2xl p-1.5 z-40">
+            <button onclick="copyGeminiSyncLine(); closeSyncMenu();" class="w-full text-left px-3 py-2 rounded-xl hover:bg-white/[0.05] text-xs font-medium text-sky-300 flex items-center justify-between">
+              <span>Copy Gemini Sync Line</span>
+              <span class="font-mono text-[10px] text-slate-500">1-Line</span>
+            </button>
+            <div class="my-1 border-t border-[#191f2c]"></div>
+            <button onclick="triggerFileImport(); closeSyncMenu();" class="w-full text-left px-3 py-2 rounded-xl hover:bg-white/[0.05] text-xs text-slate-300">
+              Import .xlsx / .csv
+            </button>
+            <button onclick="exportExcelWorkbook(); closeSyncMenu();" class="w-full text-left px-3 py-2 rounded-xl hover:bg-white/[0.05] text-xs text-slate-300">
+              Export .xlsx Workbook
+            </button>
+            <button onclick="downloadOfflineHTML(); closeSyncMenu();" class="w-full text-left px-3 py-2 rounded-xl hover:bg-white/[0.05] text-xs text-slate-300">
+              Download Offline HTML
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ======================================================================= -->
+  <!-- MAIN CONTENT CONTAINER                                                  -->
+  <!-- ======================================================================= -->
+  <main class="max-w-5xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+
+    <!-- Persistent Red Overdue Accountability Banner (Stays until yesterday's missed tasks are closed) -->
+    <div id="overdue-banner" class="hidden rounded-2xl bg-rose-950/45 border border-rose-500/40 p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div class="flex items-start gap-3">
+        <span class="w-2 h-2 rounded-full bg-rose-400 mt-1.5 shrink-0 animate-pulse"></span>
+        <div>
+          <p id="overdue-banner-title" class="text-xs font-semibold text-rose-200">Overdue Targets Unfulfilled</p>
+          <p id="overdue-banner-text" class="text-xs text-rose-300/85 mt-0.5 leading-relaxed"></p>
+        </div>
+      </div>
+      <span class="px-2.5 py-1 rounded-lg bg-rose-500/15 border border-rose-500/30 text-[10px] font-mono uppercase tracking-wider text-rose-200 shrink-0">
+        Active Until Closed
+      </span>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- VIEW 1: TODAY (ZERO-CLUTTER EXECUTION QUEUE)                          -->
+    <!-- ===================================================================== -->
+    <section id="view-today" class="space-y-6">
+      <!-- Top Mission Header + Silent 0-10 Progress Bar + High-Weightage Toggle -->
+      <div class="rounded-2xl bat-surface border p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div class="flex-1 min-w-0 space-y-2.5">
+          <div class="flex items-center gap-3">
+            <h1 id="today-mission-heading" class="text-base sm:text-lg font-semibold text-white tracking-tight">
+              Today’s Mission
+            </h1>
+            <span id="today-day-pill" class="px-2.5 py-0.5 rounded-md bat-elevated border font-mono text-[11px] text-slate-400">
+              Day 1 / 24
+            </span>
+          </div>
+
+          <!-- Minimal Silent Completion Bar (No numbers shown here; drives Roadmap 0–10 rating) -->
+          <div class="w-full max-w-md h-2 rounded-full bg-white/[0.05] overflow-hidden border border-white/[0.04]">
+            <div id="today-mission-bar" class="h-full rounded-full bg-sky-400 transition-all duration-500" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <!-- High-Weightage First Mode Toggle -->
+        <button onclick="toggleHighWeightageMode()" id="hw-toggle-btn" class="px-3.5 py-2 rounded-xl bat-elevated border text-xs font-medium text-slate-300 hover:text-white transition inline-flex items-center gap-2 shrink-0">
+          <span id="hw-toggle-dot" class="w-2 h-2 rounded-full bg-slate-500"></span>
+          <span id="hw-toggle-label">High-Weightage First: OFF</span>
+        </button>
+      </div>
+
+      <!-- Dynamic Mission Cards Rendered Here -->
+      <div id="today-sections-container" class="space-y-6"></div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- VIEW 2: ROADMAP (WINDING HIGHWAY + POPUP PREVIEW + TEST SCOREBOARD)   -->
+    <!-- ===================================================================== -->
+    <section id="view-roadmap" class="hidden space-y-6">
+      <!-- Full Test Scoreboard & Visualizer -->
+      <div class="rounded-2xl bat-surface border p-4 sm:p-5 space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <span class="text-[11px] font-mono uppercase tracking-wider text-purple-400">Mock Telemetry</span>
+            <h2 class="text-base font-semibold text-white mt-0.5">Full Test Scores</h2>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="openScoreGraph()" class="px-3 py-1.5 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 text-xs font-medium text-purple-300 transition inline-flex items-center gap-1.5">
+              <span>Score Graph</span>
+            </button>
+            <button onclick="openScoreModal()" class="px-3 py-1.5 rounded-xl bg-purple-500 hover:bg-purple-400 text-xs font-semibold text-slate-950 transition">
+              + Log Score
+            </button>
+          </div>
+        </div>
+
+        <div id="full-test-cards-grid" class="grid grid-cols-1 sm:grid-cols-3 gap-3"></div>
+      </div>
+
+      <!-- Winding Asphalt Highway & Interactive Day Scrubber + Floating Pop-up -->
+      <div class="rounded-2xl bat-surface border p-4 sm:p-5 space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <span id="roadmap-phase-tag" class="text-[11px] font-mono uppercase tracking-wider text-sky-400">
+              24-Day Closure Sprint · Ends Dec 15
+            </span>
+            <h2 class="text-base font-semibold text-white mt-0.5">Syllabus Highway</h2>
+          </div>
+
+          <button onclick="toggleHighWeightageMode()" id="hw-toggle-btn-road" class="px-3 py-1.5 rounded-xl bat-elevated border text-xs font-medium text-slate-300 hover:text-white transition inline-flex items-center gap-2">
+            <span id="hw-toggle-dot-road" class="w-2 h-2 rounded-full bg-slate-500"></span>
+            <span id="hw-toggle-label-road">High-Weightage First: OFF</span>
+          </button>
+        </div>
+
+        <!-- Scenic Winding Road SVG + Floating Preview Pop-Up Box -->
+        <div id="highway-stage" class="relative w-full rounded-2xl bat-elevated border overflow-hidden pt-32 sm:pt-36 pb-4 px-2 sm:px-4" style="background-image: radial-gradient(circle at 50% 75%, var(--accent-glow) 0%, transparent 65%), linear-gradient(180deg, rgba(255,255,255,0.015) 0%, rgba(0,0,0,0.28) 100%);">
+          <!-- Subtle Night Horizon Grid Texture -->
+          <div class="pointer-events-none absolute inset-0 opacity-[0.07]" style="background-image: linear-gradient(to right, #94a3b8 1px, transparent 1px), linear-gradient(to bottom, #94a3b8 1px, transparent 1px); background-size: 36px 36px;"></div>
+
+          <!-- Floating Pop-Up Card Above Active Road Stop (Click box to jump to date card) -->
+          <div id="road-popup-box" onclick="jumpToSelectedRoadCard()" style="left: 50%; transform: translateX(-50%);" class="cursor-pointer absolute top-3.5 z-20 w-64 sm:w-80 rounded-2xl bg-[#07090e]/95 hover:bg-[#0d111a] border border-white/15 hover:border-sky-400/60 p-3.5 shadow-[0_12px_40px_rgba(0,0,0,0.75)] backdrop-blur-md transition-all duration-200">
+            <div class="flex items-center justify-between gap-2">
+              <div class="flex items-center gap-2 min-w-0">
+                <span id="popup-status-dot" class="w-2 h-2 rounded-full bg-sky-400 shrink-0"></span>
+                <span id="popup-day-title" class="text-[11px] font-mono font-semibold text-white truncate">Day 1 · Sun, Nov 22</span>
+              </div>
+              <span class="text-[10px] font-mono text-sky-400 shrink-0">Jump ↓</span>
+            </div>
+            <div id="popup-chapters-body" class="text-xs text-slate-300 mt-1.5 leading-relaxed line-clamp-2">
+              Loading day targets...
+            </div>
+          </div>
+
+          <!-- Responsive Multi-Layer Midnight Asphalt Highway SVG (Direct Road Slider) -->
+          <svg
+            id="highway-svg"
+            viewBox="0 0 860 235"
+            onpointerdown="startHighwayDrag(event)"
+            onpointermove="moveHighwayDrag(event)"
+            onpointerup="endHighwayDrag(event)"
+            onpointercancel="endHighwayDrag(event)"
+            class="relative z-10 w-full h-44 sm:h-56 select-none overflow-visible cursor-grab active:cursor-grabbing"
+          >
+            <defs>
+              <filter id="road-neon-glow" x="-20%" y="-20%" width="140%" height="140%">
+                <feGaussianBlur stdDeviation="4.5" result="blur" />
+                <feMerge>
+                  <feMergeNode in="blur" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+              <linearGradient id="asphalt-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#0b0f17" />
+                <stop offset="50%" stop-color="#131926" />
+                <stop offset="100%" stop-color="#0b0f17" />
+              </linearGradient>
+            </defs>
+
+            <!-- Subtle Topographic Terrain Contours -->
+            <path d="M 10 212 Q 210 170, 430 198 T 850 184" fill="none" stroke="rgba(148,163,184,0.06)" stroke-width="1" />
+            <path d="M 10 40 Q 250 16, 430 34 T 850 56" fill="none" stroke="rgba(148,163,184,0.05)" stroke-width="1" />
+
+            <!-- Highway Ground Shadow & Embankment -->
+            <path d="M 44 170 C 175 170, 215 58, 430 58 C 645 58, 685 170, 816 170" fill="none" stroke="#020305" stroke-width="58" stroke-linecap="round" opacity="0.85" transform="translate(0, 6)" />
+            <path d="M 44 170 C 175 170, 215 58, 430 58 C 645 58, 685 170, 816 170" fill="none" stroke="#1b2333" stroke-width="48" stroke-linecap="round" />
+
+            <!-- Crisp Outer Road Edge / Shoulder Lines -->
+            <path d="M 44 170 C 175 170, 215 58, 430 58 C 645 58, 685 170, 816 170" fill="none" stroke="#475569" stroke-width="42" stroke-linecap="round" opacity="0.55" />
+
+            <!-- Deep Asphalt Road Surface -->
+            <path id="highway-asphalt" d="M 44 170 C 175 170, 215 58, 430 58 C 645 58, 685 170, 816 170" fill="none" stroke="url(#asphalt-grad)" stroke-width="38" stroke-linecap="round" />
+
+            <!-- Subtle Dual-Lane Tire Wear Track -->
+            <path d="M 44 170 C 175 170, 215 58, 430 58 C 645 58, 685 170, 816 170" fill="none" stroke="#1e293b" stroke-width="20" stroke-linecap="round" opacity="0.35" />
+
+            <!-- Classic Highway Dashed Center Divider -->
+            <path d="M 44 170 C 175 170, 215 58, 430 58 C 645 58, 685 170, 816 170" fill="none" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="10 10" stroke-linecap="round" opacity="0.45" />
+
+            <!-- Illuminated Active Progress Lane (Stretches Dynamically to Active Stop) -->
+            <path id="highway-progress-glow" d="M 44 170 C 175 170, 215 58, 430 58 C 645 58, 685 170, 816 170" fill="none" stroke="#38bdf8" stroke-width="10" stroke-linecap="round" opacity="0.22" filter="url(#road-neon-glow)" />
+            <path id="highway-progress-path" d="M 44 170 C 175 170, 215 58, 430 58 C 645 58, 685 170, 816 170" fill="none" stroke="#38bdf8" stroke-width="3.5" stroke-linecap="round" opacity="0.95" />
+
+            <!-- Vertical Guide Tether from Active Road Stop to Pop-Up Box -->
+            <g id="highway-tether-group"></g>
+
+            <!-- Highway Milepost Gates (Start / Phase 2 / Finish) -->
+            <g font-family="JetBrains Mono" font-size="10">
+              <rect x="14" y="204" width="96" height="20" rx="6" fill="#090b10" stroke="#1e293b" />
+              <text x="62" y="217" text-anchor="middle" fill="#94a3b8">START · NOV 22</text>
+
+              <rect x="372" y="12" width="116" height="20" rx="6" fill="#090b10" stroke="#1e293b" />
+              <text x="430" y="25" text-anchor="middle" fill="#94a3b8">PHASE 2 · DEC 1</text>
+
+              <rect x="752" y="204" width="94" height="20" rx="6" fill="#090b10" stroke="#334155" />
+              <text id="highway-finish-text" x="799" y="217" text-anchor="middle" fill="#e2e8f0" font-weight="600">DEC 15 ⚑</text>
+            </g>
+            <!-- Interactive Stop Nodes, QFT Pit-Stops, & Draggable Circular Road Slider Handle -->
+            <g id="highway-nodes-group"></g>
+          </svg>
+        </div>
+
+        <!-- Compact Road Navigation Strip (No Range Input — Drag Directly on the Road) -->
+        <div class="flex items-center justify-between text-[11px] font-mono text-slate-400 pt-0.5">
+          <button onclick="stepRoadmapSlider(-1)" class="px-2.5 py-1 rounded-lg hover:bg-white/[0.05] hover:text-white transition">← Prev Day</button>
+          <div class="flex items-center gap-2 text-center">
+            <span id="slider-active-label" class="text-slate-200 font-semibold">Day 1 · Sun, Nov 22</span>
+            <span class="hidden sm:inline text-slate-600">·</span>
+            <span class="hidden sm:inline text-[10px] text-slate-500">Drag handle along road</span>
+          </div>
+          <button onclick="stepRoadmapSlider(1)" class="px-2.5 py-1 rounded-lg hover:bg-white/[0.05] hover:text-white transition">Next Day →</button>
+        </div>
+      </div>
+
+      <!-- Connected Vertical Asphalt Road-Lane Timeline -->
+      <div class="relative rounded-2xl bat-surface border p-4 sm:p-6">
+        <div class="relative pl-10 sm:pl-14">
+          <!-- Vertical Asphalt Road Spine (Outer Shoulder + Asphalt + Dashed Lane) -->
+          <div class="pointer-events-none absolute left-2.5 sm:left-4 top-3 bottom-3 w-5 rounded-full bg-[#0b0f17] border-2 border-[#232d40] shadow-inner overflow-hidden">
+            <div class="absolute inset-y-2 left-1/2 -translate-x-1/2 w-[2px] opacity-45" style="background-image: repeating-linear-gradient(to bottom, #cbd5e1 0px, #cbd5e1 7px, transparent 7px, transparent 15px);"></div>
+          </div>
+          <div id="highway-timeline-container" class="space-y-3.5"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- VIEW 3: SYLLABUS (DUAL-LAYER PROGRESS + HIGH-WEIGHTAGE HIGHLIGHTS)    -->
+    <!-- ===================================================================== -->
+    <section id="view-syllabus" class="hidden space-y-5">
+      <!-- Split Syllabus Completion Bar (Theory + Exam Ready) -->
+      <div class="rounded-2xl bat-surface border p-4 sm:p-5 space-y-3.5">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <span class="text-[11px] font-mono uppercase tracking-wider text-slate-400">Syllabus Completion</span>
+            <h2 class="text-base font-semibold text-white mt-0.5">Theory & Exam Readiness</h2>
+          </div>
+          <span class="text-[11px] font-mono text-slate-500">Exam Ready = Theory + MUST DO PYQs</span>
+        </div>
+
+        <!-- Dual-Layer Split Progress Bar -->
+        <div class="relative w-full h-3 rounded-full bg-white/[0.05] border border-white/[0.05] overflow-hidden">
+          <div id="syl-bar-theory" class="absolute inset-y-0 left-0 rounded-full bg-indigo-500/70 transition-all duration-500" style="width: 43%"></div>
+          <div id="syl-bar-ready" class="absolute inset-y-0 left-0 rounded-full bg-emerald-400 shadow-[0_0_12px_rgba(52,211,153,0.45)] transition-all duration-500" style="width: 11%"></div>
+        </div>
+
+        <!-- Subtle Toggle Buttons Underneath for Theory & Exam Ready -->
+        <div class="flex flex-wrap items-center gap-2 pt-0.5">
+          <button onclick="toggleSyllabusBarFilter('TheoryDone')" id="syl-btn-theory" class="px-3 py-1.5 rounded-xl bat-elevated border text-xs font-medium text-slate-300 hover:text-white transition inline-flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-indigo-400"></span>
+            <span>Theory</span>
+            <span id="syl-theory-count" class="font-mono text-indigo-300">35/81</span>
+          </button>
+          <button onclick="toggleSyllabusBarFilter('ExamReady')" id="syl-btn-ready" class="px-3 py-1.5 rounded-xl bat-elevated border text-xs font-medium text-slate-300 hover:text-white transition inline-flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <span>Exam Ready</span>
+            <span id="syl-ready-count" class="font-mono text-emerald-300">9/81</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Subject Tabs, Search, & Quick Filters -->
+      <div class="rounded-2xl bat-surface border p-4 sm:p-5 space-y-3.5">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div class="inline-flex flex-wrap gap-1 p-1 rounded-xl bat-elevated border">
+            <button onclick="setSubjectTab('All')" id="syl-tab-All" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/10 text-white transition">All (81)</button>
+            <button onclick="setSubjectTab('Physics')" id="syl-tab-Physics" class="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition">Physics (28)</button>
+            <button onclick="setSubjectTab('Chemistry')" id="syl-tab-Chemistry" class="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition">Chemistry (24)</button>
+            <button onclick="setSubjectTab('Mathematics')" id="syl-tab-Mathematics" class="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition">Maths (29)</button>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <input id="syllabus-search" type="text" oninput="renderSyllabusView()" placeholder="Search chapter..." class="w-full sm:w-56 px-3 py-1.5 rounded-xl bat-elevated border text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-400 transition" />
+            <button onclick="openResetModal()" class="px-3 py-1.5 rounded-xl bat-elevated border hover:border-rose-500/40 text-xs font-medium text-slate-400 hover:text-rose-300 transition shrink-0">
+              Reset
+            </button>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-[#191f2c]">
+          <div class="flex flex-wrap gap-1.5">
+            <button onclick="setSyllabusFilter('All')" id="chip-All" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-white/10 text-white transition">All</button>
+            <button onclick="setSyllabusFilter('HighWeightage')" id="chip-HighWeightage" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-red-500/10 text-red-300 border border-red-500/20 hover:bg-red-500/20 transition">High Weightage</button>
+            <button onclick="setSyllabusFilter('ReadyPYQ')" id="chip-ReadyPYQ" class="px-2.5 py-1 rounded-lg text-xs font-medium bat-elevated text-slate-400 hover:text-white transition">Ready for PYQs</button>
+            <button onclick="setSyllabusFilter('OpenLoops')" id="chip-OpenLoops" class="px-2.5 py-1 rounded-lg text-xs font-medium bat-elevated text-slate-400 hover:text-white transition">Open Loops</button>
+            <button onclick="setSyllabusFilter('NotStarted')" id="chip-NotStarted" class="px-2.5 py-1 rounded-lg text-xs font-medium bat-elevated text-slate-400 hover:text-white transition">Not Started</button>
+            <button onclick="setSyllabusFilter('ExamReady')" id="chip-ExamReady" class="px-2.5 py-1 rounded-lg text-xs font-medium bat-elevated text-slate-400 hover:text-white transition">Exam Ready</button>
+          </div>
+          <span class="text-[11px] font-mono text-slate-500">Tap any status pill to cycle</span>
+        </div>
+      </div>
+
+      <!-- Master Chapter Table -->
+      <div class="rounded-2xl bat-surface border overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-[#191f2c] bg-white/[0.02] text-[11px] font-mono uppercase tracking-wider text-slate-400">
+                <th class="py-3 px-4 sm:px-5 font-semibold">Chapter</th>
+                <th class="py-3 px-3 font-semibold">Mode</th>
+                <th class="py-3 px-3 text-center font-semibold">Theory</th>
+                <th class="py-3 px-4 sm:px-5 text-center font-semibold">MUST DO PYQs</th>
+              </tr>
+            </thead>
+            <tbody id="syllabus-tbody" class="divide-y divide-[#191f2c] text-xs sm:text-sm"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // =========================================================================
+    // 1. CONSTANTS, 5:00 AM IST ROLLOVER ENGINE, & BASELINE DATASET
+    // =========================================================================
+    const SPRINT_START = '2026-11-22';
+    const SPRINT_END = '2026-12-15';
+    const BUFFER_END = '2026-12-20';
+    const STORAGE_KEY = 'jee2027_batcave_locked_v1';
+
+    // 41 High-Weightage Chapters (Physics 72+ marks, Chemistry 60+ marks, Maths 50+ marks)
+    const HIGH_WEIGHTAGE_SET = new Set([
+      // Physics (19)
+      'Ray Optics', 'Electrostatics', 'Current Electricity', 'Units and Dimensions',
+      'Rotational Motion', 'Magnetic Effects of Current', 'Mechanical Properties of Fluids',
+      'Wave Optics', 'Semiconductors & EM Waves', 'Dual Nature of Matter',
+      'Thermodynamics', 'Kinetic Theory of Gases', 'Capacitance',
+      'Electromagnetic Induction', 'Atomic Physics', 'Alternating Current',
+      'Work Power Energy', 'Thermal Properties of Matter',
+      // Chemistry (12)
+      'Coordination Compounds', 'Hydrocarbon', 'Structure of Atom',
+      'Chemical Kinetics', 'General Organic Chemistry', 'Chemical Bonding',
+      'Solutions', 'Mole Concept', 'd and f Block Elements',
+      'Practical Chemistry [Qualitative Analysis]', 'Aldehydes, Ketones',
+      'Periodic Table & Properties',
+      // Mathematics (11)
+      'Three-Dimensional Geometry', 'Sequences and Series', 'Functions',
+      'Differential Equations', 'Definite Integration', 'Vector Algebra',
+      'Permutations and Combinations', 'Quadratic Equation', 'Binomial theorem',
+      'Probability', 'Complex Number'
+    ]);
+
+    // Quizr Full Test (QFT) Schedule (Saturday Half-Load Revision + Sunday 3h Mock + 90m Analysis)
+    const QUIZR_EVENTS = {
+      '2026-11-28': { type: 'prep', testId: 'qft-1', title: 'QFT-1 Pre-Test Revision Block', subtitle: 'Afternoon + Night Revision Sweep (Half syllabus load today)' },
+      '2026-11-29': { type: 'test', testId: 'qft-1', title: 'Quizr Full Test 1 (QFT-1)', subtitle: '3-Hour Full Mock + 90-Min Error Audit' },
+      '2026-12-05': { type: 'prep', testId: 'qft-2', title: 'QFT-2 Pre-Test Revision Block', subtitle: 'Afternoon + Night Revision Sweep (Half syllabus load today)' },
+      '2026-12-06': { type: 'test', testId: 'qft-2', title: 'Quizr Full Test 2 (QFT-2)', subtitle: '3-Hour Full Mock + 90-Min Error Audit' },
+      '2026-12-12': { type: 'prep', testId: 'qft-3', title: 'QFT-3 Pre-Test Revision Block', subtitle: 'Afternoon + Night Revision Sweep (Half syllabus load today)' },
+      '2026-12-13': { type: 'test', testId: 'qft-3', title: 'Quizr Full Test 3 (QFT-3)', subtitle: '3-Hour Full Mock + 90-Min Error Audit' }
+    };
+
+    // Agreed Syllabus Pathway:
+    // Physics: AC -> Semiconductors & EM Waves -> Class 11 Part-2 (Gravitation, Solids, Fluids, Thermal, KTG, Thermo) -> Class 12 Part-2 (Ray/Wave Optics, Modern Physics)
+    // Chemistry: Inorganic + GOC + Isomerism + Hydrocarbon before Nov 30, then remaining Organic
+    const THEORY_PRIORITY_ORDER = [
+      'Alternating Current', 'General Organic Chemistry', 'Coordination Compounds',
+      'Isomerism', 'Hydrocarbon', 'd and f Block Elements', 'p Block Elements',
+      'Practical Chemistry [Qualitative Analysis]', 'Solutions', 'Structure of Atom',
+      'Semiconductors & EM Waves', 'Gravitation', 'Mechanical Properties of Solids',
+      'Mechanical Properties of Fluids', 'Thermal Properties of Matter',
+      'Kinetic Theory of Gases', 'Thermodynamics', 'Ray Optics', 'Wave Optics',
+      'Dual Nature of Matter', 'Atomic Physics', 'Nuclear Physics',
+      'Haloalkanes and Haloarenes', 'Alcohols, Phenols and Ethers',
+      'Aldehydes, Ketones', 'Carboxylic Acid Derivatives', 'Amines', 'Biomolecules',
+      'Waves and Sound', 'Units and Dimensions', 'Motion In One Dimension', 'Motion In Two Dimensions',
+      'Vector Algebra', 'Three-Dimensional Geometry', 'Matrices', 'Determinants',
+      'Quadratic Equation', 'Sequences and Series', 'Binomial theorem',
+      'Permutations and Combinations', 'Probability', 'Statistics',
+      'Functions', 'Inverse Trigonometry', 'Hyperbola', 'Complex Number'
+    ];
+
+    const PYQ_PRIORITY_ORDER = [
+      'Alternating Current', 'Parabola', 'Circle', 'Straight Lines', 'Ellipse',
+      'Work Power Energy', 'COM, Momentum & Collision', 'Laws of Motion', 'Oscillation',
+      'Chemical Kinetics', 'Electrochemistry', 'Mole Concept', 'Thermodynamics (C)',
+      'Chemical Equilibrium', 'Ionic Equilibrium', 'Redox Reactions',
+      'Structure of Atom', 'Solutions', 'General Organic Chemistry', 'Coordination Compounds',
+      'Limits', 'Continuity and Differentiability', 'Application of Derivatives',
+      'Definite Integration', 'Indefinite Integration', 'Area Under Curves', 'Differential Equations',
+      'Basic of Mathematics', 'Trigonometric Functions', 'Trigonometric Equation', 'Sets and Relations'
+    ];
+
+    const SUBJECT_STYLE = {
+      Physics: { dot: 'bg-sky-400', text: 'text-sky-300', hex: '#38bdf8' },
+      Chemistry: { dot: 'bg-emerald-400', text: 'text-emerald-300', hex: '#34d399' },
+      Mathematics: { dot: 'bg-amber-400', text: 'text-amber-300', hex: '#fbbf24' },
+      QFT: { dot: 'bg-purple-400', text: 'text-purple-300', hex: '#c084fc' }
+    };
+
+    const INITIAL_DATA = {
+      version: 5,
+      lastStudyDate: '2026-11-22',
+      highWeightageFirst: false,
+      bufferActivated: false,
+      sessionSyncCount: 0,
+      sessionCompletedLog: [],
+      deferredTheoryIds: [],
+      pinnedTodayTheoryIds: [],
+      recentTheoryDoneIds: [],
+      dailyCommitments: {},
+      dailyRatings: {},
+      testScores: [
+        { id: 'qft-1', name: 'QFT-1', date: '2026-11-29', phy: null, chem: null, math: null, total: null, note: '' },
+        { id: 'qft-2', name: 'QFT-2', date: '2026-12-06', phy: null, chem: null, math: null, total: null, note: '' },
+        { id: 'qft-3', name: 'QFT-3', date: '2026-12-13', phy: null, chem: null, math: null, total: null, note: '' }
+      ],
+      chapters: [
+        // PHYSICS (28)
+        { id: 'phy-1', subject: 'Physics', name: 'Units and Dimensions', theory: 'Not Started', pyqs: 'Not Started', mode: '90m Sitter', srCount: 0 },
+        { id: 'phy-2', subject: 'Physics', name: 'Motion In One Dimension', theory: 'Not Started', pyqs: 'Not Started', mode: 'Full Top 500', srCount: 0 },
+        { id: 'phy-3', subject: 'Physics', name: 'Motion In Two Dimensions', theory: 'Not Started', pyqs: 'Not Started', mode: 'Full Top 500', srCount: 0 },
+        { id: 'phy-4', subject: 'Physics', name: 'Laws of Motion', theory: 'Completed', pyqs: 'Ongoing', mode: 'Full Top 500', srCount: 0 },
+        { id: 'phy-5', subject: 'Physics', name: 'Work Power Energy', theory: 'Completed', pyqs: 'Ongoing', mode: 'Full Top 500', srCount: 0 },
+        { id: 'phy-6', subject: 'Physics', name: 'COM, Momentum & Collision', theory: 'Completed', pyqs: 'Ongoing', mode: 'Full Top 500', srCount: 0 },
+        { id: 'phy-7', subject: 'Physics', name: 'Rotational Motion', theory: 'Completed', pyqs: 'Completed', mode: 'Full Top 500', srCount: 1 },
+        { id: 'phy-8', subject: 'Physics', name: 'Atomic Physics', theory: 'Not Started', pyqs: 'Not Started', mode: 'Full Top 500', srCount: 0 },
+        { id: 'phy-9', subject: 'Physics', name: 'Dual Nature of Matter', theory: 'Not Started', pyqs: 'Not Started', mode: 'Full Top 500', srCount: 0 },
+        { id: 'phy-10', subject: 'Physics', name: 'Nuclear Physics', theory: 'Not Started', pyqs: 'Not Started', mode: 'Full Top 500', srCount: 0 },
+        { id: 'phy-11', subject: 'Physics', name: 'Kinetic Theory of Gases', theory: 'Not Started', pyqs: 'Not Started', mode: 'Full Top 500', srCount: 0 },
+        { id: 'phy-12', subject: 'Physics', name: 'Thermal Properties of Matter', theory: 'Not Started', pyqs: 'Not Started', mode: '90m Sitter', srCount: 0 },
+        { id: 'phy-13', subject: 'Physics', name: 'Thermodynamics', theory: 'Not Started', pyqs: 'Not Started', mode: 'Full Top 500', srCount: 0 },
+        { id: 'phy-14', subject: 'Physics', name: 'Mechanical Properties of Fluids', theory: 'Not Started', pyqs: 'Not Started', mode: '90m Sitter', srCount: 0 },
+        { id: 'phy-15', subject: 'Physics', name: 'Mechanical Properties of Solids', theory: 'Not Started', pyqs: 'Not Started', mode: '90m Sitter', srCount: 0 },
+        { id: 'phy-16', subject: 'Physics', name: 'Oscillation', theory: 'Completed', pyqs: 'Ongoing', mode: 'Full Top 500', srCount: 0 },
+        { id: 'phy-17', subject: 'Physics', name: 'Electrostatics', theory: 'Completed', pyqs: 'Completed', mode: 'Full Top 500', srCount: 1 },
+        { id: 'phy-18', subject: 'Physics', name: 'Gravitation', theory: 'Not Started', pyqs: 'Not Started', mode: 'Full Top 500', srCount: 0 },
+        { id: 'phy-19', subject: 'Physics', name: 'Capacitance', theory: 'Completed', pyqs: 'Completed', mode: 'Full Top 500', srCount: 1 },
+        { id: 'phy-20', subject: 'Physics', name: 'Current Electricity', theory: 'Completed', pyqs: 'Completed', mode: 'Full Top 500', srCount: 1 },
+        { id: 'phy-21', subject: 'Physics', name: 'Magnetic Effects of Current', theory: 'Completed', pyqs: 'Completed', mode: 'Full Top 500', srCount: 1 },
+        { id: 'phy-22', subject: 'Physics', name: 'Magnetic Properties of Matter', theory: 'Completed', pyqs: 'Completed', mode: '90m Sitter', srCount: 1 },
+        { id: 'phy-23', subject: 'Physics', name: 'Alternating Current', theory: 'Ongoing', pyqs: 'Not Started', mode: 'Full Top 500', srCount: 0 },
+        { id: 'phy-24', subject: 'Physics', name: 'Electromagnetic Induction', theory: 'Completed', pyqs: 'Completed', mode: 'Full Top 500', srCount: 1 },
+        { id: 'phy-25', subject: 'Physics', name: 'Wave Optics', theory: 'Not Started', pyqs: 'Not Started', mode: 'Full Top 500', srCount: 0 },
+        { id: 'phy-26', subject: 'Physics', name: 'Ray Optics', theory: 'Not Started', pyqs: 'Not Started', mode: 'Full Top 500', srCount: 0 },
+        { id: 'phy-27', subject: 'Physics', name: 'Waves and Sound', theory: 'Not Started', pyqs: 'Not Started', mode: '90m Sitter', srCount: 0 },
+        { id: 'phy-28', subject: 'Physics', name: 'Semiconductors & EM Waves', theory: 'Not Started', pyqs: 'Not Started', mode: 'Full Top 500', srCount: 0 },
+
+        // CHEMISTRY (24)
+        { id: 'chem-1', subject: 'Chemistry', name: 'Mole Concept', theory: 'Completed', pyqs: 'Ongoing', mode: 'Full Top 500', srCount: 0 },
+        { id: 'chem-2', subject: 'Chemistry', name: 'Structure of Atom', theory: 'Ongoing', pyqs: 'Ongoing', mode: 'Full Top 500', srCount: 0 },
+        { id: 'chem-3', subject: 'Chemistry', name: 'Solutions', theory: 'Ongoing', pyqs: 'Ongoing', mode: 'Full Top 500', srCount: 0 },
+        { id: 'chem-4', subject: 'Chemistry', name: 'Electrochemistry', theory: 'Completed', pyqs: 'Ongoing', mode: 'Full Top 500', srCount: 0 },
+        { id: 'chem-5', subject: 'Chemistry', name: 'Chemical Kinetics', theory: 'Completed', pyqs: 'Ongoing', mode: 'Full Top 500', srCount: 0 },
+        { id: 'chem-6', subject: 'Chemistry', name: 'Chemical Equilibrium', theory: 'Completed', pyqs: 'Ongoing', mode: '90m Sitter', srCount: 0 },
+        { id: 'chem-7', subject: 'Chemistry', name: 'Ionic Equilibrium', theory: 'Completed', pyqs: 'Ongoing', mode: '90m Sitter', srCount: 0 },
+        { id: 'chem-8', subject: 'Chemistry', name: 'Redox Reactions', theory: 'Completed', pyqs: 'Ongoing', mode: '90m Sitter', srCount: 0 },
+        { id: 'chem-9', subject: 'Chemistry', name: 'Thermodynamics (C)', theory: 'Completed', pyqs: 'Ongoing', mode: 'Full Top 500', srCount: 0 },
+        { id: 'chem-10', subject: 'Chemistry', name: 'Periodic Table & Properties', theory: 'Completed', pyqs: 'Completed', mode: 'Full Top 500', srCount: 1 },
+        { id: 'chem-11', subject: 'Chemistry', name: 'Chemical Bonding', theory: 'Completed', pyqs: 'Completed', mode: 'Full Top 500', srCount: 1 },
+        { id: 'chem-12', subject: 'Chemistry', name: 'General Organic Chemistry', theory: 'Ongoing', pyqs: 'Not Started', mode: 'Full Top 500', srCount: 0 },
+        { id: 'chem-13', subject: 'Chemistry', name: 'Isomerism', theory: 'Not Started', pyqs: 'Not Started', mode: 'Full Top 500', srCount: 0 },
+        { id: 'chem-14', subject: 'Chemistry', name: 'Hydrocarbon', theory: 'Not Started', pyqs: 'Not Started', mode: 'Full Top 500', srCount: 0 },
+        { id: 'chem-15', subject: 'Chemistry', name: 'Haloalkanes and Haloarenes', theory: 'Not Started', pyqs: 'Not Started', mode: 'Full Top 500', srCount: 0 },
+        { id: 'chem-16', subject: 'Chemistry', name: 'Alcohols, Phenols and Ethers', theory: 'Not Started', pyqs: 'Not Started', mode: 'Full Top 500', srCount: 0 },
+        { id: 'chem-17', subject: 'Chemistry', name: 'Aldehydes, Ketones', theory: 'Not Started', pyqs: 'Not Started', mode: 'Full Top 500', srCount: 0 },
+        { id: 'chem-18', subject: 'Chemistry', name: 'Carboxylic Acid Derivatives', theory: 'Not Started', pyqs: 'Not Started', mode: '90m Sitter', srCount: 0 },
+        { id: 'chem-19', subject: 'Chemistry', name: 'Amines', theory: 'Not Started', pyqs: 'Not Started', mode: 'Full Top 500', srCount: 0 },
+        { id: 'chem-20', subject: 'Chemistry', name: 'Biomolecules', theory: 'Not Started', pyqs: 'Not Started', mode: 'Full Top 500', srCount: 0 },
+        { id: 'chem-21', subject: 'Chemistry', name: 'Coordination Compounds', theory: 'Ongoing', pyqs: 'Not Started', mode: 'Full Top 500', srCount: 0 },
+        { id: 'chem-22', subject: 'Chemistry', name: 'd and f Block Elements', theory: 'Not Started', pyqs: 'Not Started', mode: 'Full Top 500', srCount: 0 },
+        { id: 'chem-23', subject: 'Chemistry', name: 'p Block Elements', theory: 'Not Started', pyqs: 'Not Started', mode: 'Full Top 500', srCount: 0 },
+        { id: 'chem-24', subject: 'Chemistry', name: 'Practical Chemistry [Qualitative Analysis]', theory: 'Not Started', pyqs: 'Not Started', mode: '90m Sitter', srCount: 0 },
+
+        // MATHEMATICS (29)
+        { id: 'math-1', subject: 'Mathematics', name: 'Basic of Mathematics', theory: 'Completed', pyqs: 'Not Started', mode: '90m Sitter', srCount: 0 },
+        { id: 'math-2', subject: 'Mathematics', name: 'Quadratic Equation', theory: 'Not Started', pyqs: 'Not Started', mode: 'Full Top 500', srCount: 0 },
+        { id: 'math-3', subject: 'Mathematics', name: 'Sequences and Series', theory: 'Not Started', pyqs: 'Not Started', mode: 'Full Top 500', srCount: 0 },
+        { id: 'math-4', subject: 'Mathematics', name: 'Trigonometric Functions', theory: 'Completed', pyqs: 'Not Started', mode: '90m Sitter', srCount: 0 },
+        { id: 'math-5', subject: 'Mathematics', name: 'Trigonometric Equation', theory: 'Completed', pyqs: 'Not Started', mode: '90m Sitter', srCount: 0 },
+        { id: 'math-6', subject: 'Mathematics', name: 'Permutations and Combinations', theory: 'Not Started', pyqs: 'Not Started', mode: '90m Sitter', srCount: 0 },
+        { id: 'math-7', subject: 'Mathematics', name: 'Binomial theorem', theory: 'Not Started', pyqs: 'Not Started', mode: 'Full Top 500', srCount: 0 },
+        { id: 'math-8', subject: 'Mathematics', name: 'Straight Lines', theory: 'Completed', pyqs: 'Ongoing', mode: 'Full Top 500', srCount: 0 },
+        { id: 'math-9', subject: 'Mathematics', name: 'Circle', theory: 'Completed', pyqs: 'Ongoing', mode: 'Full Top 500', srCount: 0 },
+        { id: 'math-10', subject: 'Mathematics', name: 'Parabola', theory: 'Completed', pyqs: 'Ongoing', mode: 'Full Top 500', srCount: 0 },
+        { id: 'math-11', subject: 'Mathematics', name: 'Ellipse', theory: 'Completed', pyqs: 'Not Started', mode: 'Full Top 500', srCount: 0 },
+        { id: 'math-12', subject: 'Mathematics', name: 'Hyperbola', theory: 'Not Started', pyqs: 'Not Started', mode: 'Full Top 500', srCount: 0 },
+        { id: 'math-13', subject: 'Mathematics', name: 'Matrices', theory: 'Not Started', pyqs: 'Not Started', mode: 'Full Top 500', srCount: 0 },
+        { id: 'math-14', subject: 'Mathematics', name: 'Determinants', theory: 'Not Started', pyqs: 'Not Started', mode: 'Full Top 500', srCount: 0 },
+        { id: 'math-15', subject: 'Mathematics', name: 'Sets and Relations', theory: 'Completed', pyqs: 'Not Started', mode: 'Full Top 500', srCount: 0 },
+        { id: 'math-16', subject: 'Mathematics', name: 'Functions', theory: 'Not Started', pyqs: 'Not Started', mode: 'Full Top 500', srCount: 0 },
+        { id: 'math-17', subject: 'Mathematics', name: 'Inverse Trigonometry', theory: 'Not Started', pyqs: 'Not Started', mode: '90m Sitter', srCount: 0 },
+        { id: 'math-18', subject: 'Mathematics', name: 'Limits', theory: 'Completed', pyqs: 'Not Started', mode: 'Full Top 500', srCount: 0 },
+        { id: 'math-19', subject: 'Mathematics', name: 'Continuity and Differentiability', theory: 'Completed', pyqs: 'Not Started', mode: 'Full Top 500', srCount: 0 },
+        { id: 'math-20', subject: 'Mathematics', name: 'Application of Derivatives', theory: 'Completed', pyqs: 'Not Started', mode: 'Full Top 500', srCount: 0 },
+        { id: 'math-21', subject: 'Mathematics', name: 'Indefinite Integration', theory: 'Completed', pyqs: 'Not Started', mode: '90m Sitter', srCount: 0 },
+        { id: 'math-22', subject: 'Mathematics', name: 'Definite Integration', theory: 'Completed', pyqs: 'Not Started', mode: 'Full Top 500', srCount: 0 },
+        { id: 'math-23', subject: 'Mathematics', name: 'Area Under Curves', theory: 'Completed', pyqs: 'Not Started', mode: 'Full Top 500', srCount: 0 },
+        { id: 'math-24', subject: 'Mathematics', name: 'Differential Equations', theory: 'Completed', pyqs: 'Not Started', mode: 'Full Top 500', srCount: 0 },
+        { id: 'math-25', subject: 'Mathematics', name: 'Vector Algebra', theory: 'Not Started', pyqs: 'Not Started', mode: 'Full Top 500', srCount: 0 },
+        { id: 'math-26', subject: 'Mathematics', name: 'Three-Dimensional Geometry', theory: 'Not Started', pyqs: 'Not Started', mode: 'Full Top 500', srCount: 0 },
+        { id: 'math-27', subject: 'Mathematics', name: 'Complex Number', theory: 'Not Started', pyqs: 'Not Started', mode: '90m Sitter', srCount: 0 },
+        { id: 'math-28', subject: 'Mathematics', name: 'Probability', theory: 'Not Started', pyqs: 'Not Started', mode: 'Full Top 500', srCount: 0 },
+        { id: 'math-29', subject: 'Mathematics', name: 'Statistics', theory: 'Not Started', pyqs: 'Not Started', mode: 'Full Top 500', srCount: 0 }
+      ]
+    };
+
+    // =========================================================================
+    // 2. IST 5:00 AM STUDY-DAY CLOCK & BUFFER AUTO-SYNC
+    // =========================================================================
+    let state = null;
+    let ui = {
+      activeView: 'today',
+      activeSubject: 'All',
+      syllabusFilter: 'All',
+      selectedRoadIdx: 0,
+      graphMode: 'total',
+      activeLock: null,
+      lastCompletedTheoryChapterId: null,
+      cachedRoadmapDays: [],
+      isDraggingRoad: false,
+      exitHoldRaf: null,
+      exitHoldStart: 0
+    };
+    const EXIT_HOLD_DURATION_MS = 7000;
+
+    function getISTHour() {
+      const parts = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'Asia/Kolkata',
+        hour: '2-digit',
+        hour12: false
+      }).formatToParts(new Date());
+      const h = parts.find(p => p.type === 'hour');
+      return h ? parseInt(h.value, 10) : 12;
+    }
+
+    // Study-day boundary is 5:00 AM IST (00:00–04:59 AM counts as previous study date)
+    function getStudyDateISO() {
+      const now = new Date();
+      const istParts = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'Asia/Kolkata',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        hour12: false
+      }).formatToParts(now);
+
+      const map = {};
+      istParts.forEach(p => { map[p.type] = p.value; });
+      const hour = parseInt(map.hour, 10);
+      const baseDate = new Date(`${map.year}-${map.month}-${map.day}T12:00:00Z`);
+      if (hour < 5) {
+        baseDate.setUTCDate(baseDate.getUTCDate() - 1);
+      }
+      const iso = baseDate.toISOString().slice(0, 10);
+      return iso < SPRINT_START ? SPRINT_START : iso;
+    }
+
+    function addDaysISO(iso, days) {
+      const d = new Date(iso + 'T12:00:00Z');
+      d.setUTCDate(d.getUTCDate() + days);
+      return d.toISOString().slice(0, 10);
+    }
+
+    function diffDaysISO(startIso, endIso) {
+      const a = new Date(startIso + 'T12:00:00Z');
+      const b = new Date(endIso + 'T12:00:00Z');
+      return Math.round((b - a) / 86400000);
+    }
+
+    function formatShortDate(iso) {
+      const d = new Date(iso + 'T12:00:00Z');
+      return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'UTC' });
+    }
+
+    function isSyllabusComplete() {
+      return state.chapters.every(c => c.theory === 'Completed' && c.pyqs === 'Completed');
+    }
+
+    // Silent Reserve Buffer (Dec 16–20): strictly hidden until Dec 16 arrives with incomplete syllabus
+    function isBufferActive(todayIso) {
+      if (state.bufferActivated) return true;
+      if (todayIso > SPRINT_END && !isSyllabusComplete()) {
+        state.bufferActivated = true;
+        saveState();
+        return true;
+      }
+      return false;
+    }
+
+    function getActiveHorizonEnd(todayIso) {
+      return isBufferActive(todayIso) ? BUFFER_END : SPRINT_END;
+    }
+
+    function loadState() {
+      let loaded = null;
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          const embeddedTs = INITIAL_DATA.savedAt || 0;
+          const localTs = parsed.savedAt || 0;
+          if (parsed && Array.isArray(parsed.chapters) && parsed.chapters.length === 81 && localTs >= embeddedTs) {
+            loaded = parsed;
+          }
+        }
+      } catch (e) {
+        console.error('Storage load error:', e);
+      }
+
+      if (!loaded) {
+        loaded = JSON.parse(JSON.stringify(INITIAL_DATA));
+      }
+
+      loaded.dailyCommitments = loaded.dailyCommitments || {};
+      loaded.dailyRatings = loaded.dailyRatings || {};
+      loaded.deferredTheoryIds = loaded.deferredTheoryIds || [];
+      loaded.pinnedTodayTheoryIds = loaded.pinnedTodayTheoryIds || [];
+      loaded.recentTheoryDoneIds = loaded.recentTheoryDoneIds || [];
+      loaded.sessionCompletedLog = loaded.sessionCompletedLog || [];
+      loaded.testScores = loaded.testScores || JSON.parse(JSON.stringify(INITIAL_DATA.testScores));
+
+      state = loaded;
+      const initToday = getStudyDateISO();
+      const maxRoadIdx = Math.max(0, diffDaysISO(SPRINT_START, getActiveHorizonEnd(initToday)));
+      ui.selectedRoadIdx = Math.max(0, Math.min(maxRoadIdx, diffDaysISO(SPRINT_START, initToday)));
+      handleStudyDayRollover(false);
+    }
+
+    function saveState() {
+      try {
+        state.savedAt = Date.now();
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (e) {
+        console.error('Storage save error:', e);
+      }
+    }
+
+    function handleStudyDayRollover(shouldRender) {
+      const todayIso = getStudyDateISO();
+      const wasBufferOn = !!state.bufferActivated;
+      const bufferNowOn = isBufferActive(todayIso);
+      const bufferJustUnlocked = !wasBufferOn && bufferNowOn;
+
+      if (state.lastStudyDate && state.lastStudyDate < todayIso) {
+        const prevIso = state.lastStudyDate;
+        const prevCommit = state.dailyCommitments[prevIso];
+        if (prevCommit) {
+          const totalPlanned = (prevCommit.theoryIds?.length || 0) +
+            (prevCommit.pyqIds?.length || 0) +
+            (prevCommit.srIds?.length || 0) +
+            (QUIZR_EVENTS[prevIso] ? 1 : 0);
+          if (totalPlanned > 0) {
+            const doneCount = countCommitCompleted(prevIso, prevCommit);
+            state.dailyRatings[prevIso] = Math.min(10, Math.max(0, Math.round((doneCount / totalPlanned) * 10)));
+          } else {
+            state.dailyRatings[prevIso] = 10;
+          }
+        }
+
+        // Promote yesterday's deferred Theory chapters to the front of Today so they never loop endlessly
+        if (state.deferredTheoryIds && state.deferredTheoryIds.length > 0) {
+          state.pinnedTodayTheoryIds = Array.from(new Set([
+            ...(state.pinnedTodayTheoryIds || []),
+            ...state.deferredTheoryIds
+          ]));
+          state.deferredTheoryIds = [];
+        }
+
+        state.lastStudyDate = todayIso;
+        const maxRoadIdx = Math.max(0, diffDaysISO(SPRINT_START, getActiveHorizonEnd(todayIso)));
+        ui.selectedRoadIdx = Math.max(0, Math.min(maxRoadIdx, diffDaysISO(SPRINT_START, todayIso)));
+        saveState();
+        if (shouldRender) {
+          renderAll();
+          showToast(
+            bufferJustUnlocked
+              ? 'Reserve Buffer (Dec 16–20) unlocked — remaining syllabus rebalanced.'
+              : `New Study Day (${formatShortDate(todayIso)}) unlocked at 5:00 AM IST.`
+          );
+        }
+      } else {
+        state.lastStudyDate = todayIso;
+        saveState();
+      }
+    }
+
+    // =========================================================================
+    // 3. DYNAMIC SCHEDULE & HIGH-WEIGHTAGE-FIRST ENGINE (100% SYLLABUS GUARANTEED)
+    // =========================================================================
+    function getPrioritySortedChapters(chapters, priorityList, highWeightageFirst) {
+      return [...chapters].sort((a, b) => {
+        const idxA = priorityList.indexOf(a.name);
+        const idxB = priorityList.indexOf(b.name);
+        const rA = idxA === -1 ? 999 : idxA;
+        const rB = idxB === -1 ? 999 : idxB;
+
+        // When High-Weightage First is ON: prioritize all 41 high-weightage chapters first
+        // (keeping active Ongoing high-weightage loops at the very top), then complete the remaining 40.
+        if (highWeightageFirst) {
+          const aHw = HIGH_WEIGHTAGE_SET.has(a.name) ? 0 : 1;
+          const bHw = HIGH_WEIGHTAGE_SET.has(b.name) ? 0 : 1;
+          if (aHw !== bHw) return aHw - bHw;
+
+          const aOngoing = (a.theory === 'Ongoing' || a.pyqs === 'Ongoing') ? 0 : 1;
+          const bOngoing = (b.theory === 'Ongoing' || b.pyqs === 'Ongoing') ? 0 : 1;
+          if (aOngoing !== bOngoing) return aOngoing - bOngoing;
+
+          return rA - rB;
+        }
+
+        // When High-Weightage First is OFF: restore the exact originally planned sequence
+        // (with active Ongoing loops first, followed strictly by THEORY_PRIORITY_ORDER / PYQ_PRIORITY_ORDER).
+        const aOngoing = (a.theory === 'Ongoing' || a.pyqs === 'Ongoing') ? 0 : 1;
+        const bOngoing = (b.theory === 'Ongoing' || b.pyqs === 'Ongoing') ? 0 : 1;
+        if (aOngoing !== bOngoing) return aOngoing - bOngoing;
+
+        return rA - rB;
+      });
+    }
+
+    function generateDynamicSchedule() {
+      const todayIso = getStudyDateISO();
+      const horizonEnd = getActiveHorizonEnd(todayIso);
+      // Always anchor daySlots[0] to todayIso so Today actions never drift past Dec 15 / Dec 20
+      const totalDays = todayIso > horizonEnd ? 1 : Math.max(1, diffDaysISO(todayIso, horizonEnd) + 1);
+
+      state.recentTheoryDoneIds = (state.recentTheoryDoneIds || []).filter(id => {
+        const ch = state.chapters.find(c => c.id === id);
+        return ch && ch.theory === 'Completed' && ch.pyqs !== 'Completed';
+      });
+
+      const remTheoryAll = getPrioritySortedChapters(
+        state.chapters.filter(c => c.theory !== 'Completed'),
+        THEORY_PRIORITY_ORDER,
+        state.highWeightageFirst
+      );
+
+      // Only schedule MUST DO PYQs for chapters whose Theory is already Completed
+      // (chapters with incomplete Theory will automatically queue their PYQs once Theory closes)
+      const remPyqAll = getPrioritySortedChapters(
+        state.chapters.filter(c => c.theory === 'Completed' && c.pyqs !== 'Completed'),
+        PYQ_PRIORITY_ORDER,
+        state.highWeightageFirst
+      );
+
+      const srPool = state.chapters
+        .filter(c => c.theory === 'Completed' && c.pyqs === 'Completed')
+        .sort((a, b) => (a.srCount || 0) - (b.srCount || 0));
+
+      const daySlots = [];
+      let totalWeight = 0;
+      for (let i = 0; i < totalDays; i++) {
+        const iso = addDaysISO(todayIso, i);
+        const qft = QUIZR_EVENTS[iso] || null;
+        const weight = qft ? 0.5 : 1.0;
+        totalWeight += weight;
+        daySlots.push({ iso, qft, weight, theory: [], pyqs: [], sr: [] });
+      }
+
+      // Never allow deferrals to hide chapters on the final day (totalDays === 1)
+      const deferredSet = totalDays > 1 ? new Set(state.deferredTheoryIds || []) : new Set();
+      const pinnedTodaySet = new Set(state.pinnedTodayTheoryIds || []);
+      const deferredTheory = remTheoryAll.filter(c => deferredSet.has(c.id));
+      const pinnedTodayTheory = remTheoryAll.filter(c => !deferredSet.has(c.id) && pinnedTodaySet.has(c.id));
+      const regularTheory = remTheoryAll.filter(c => !deferredSet.has(c.id) && !pinnedTodaySet.has(c.id));
+      const orderedTodayEligibleTheory = [...pinnedTodayTheory, ...regularTheory];
+
+      // Step 1: Compute Today's baseline quota and lock Today's commitment first
+      const todaySlot = daySlots[0];
+      if (todaySlot) {
+        const todayTheoryQuota = totalDays === 1
+          ? orderedTodayEligibleTheory.length
+          : Math.min(
+              orderedTodayEligibleTheory.length,
+              Math.max(pinnedTodayTheory.length, Math.round((orderedTodayEligibleTheory.length * todaySlot.weight) / totalWeight))
+            );
+        todaySlot.theory = orderedTodayEligibleTheory.slice(0, todayTheoryQuota);
+
+        const todayPyqQuota = totalDays === 1
+          ? remPyqAll.length
+          : Math.min(remPyqAll.length, Math.round((remPyqAll.length * todaySlot.weight) / totalWeight));
+        todaySlot.pyqs = remPyqAll.slice(0, todayPyqQuota);
+
+        if (srPool.length > 0 && !(todaySlot.qft && todaySlot.qft.type === 'test')) {
+          const srCount = todaySlot.qft ? 1 : Math.min(2, srPool.length);
+          for (let k = 0; k < srCount; k++) {
+            todaySlot.sr.push(srPool[k % srPool.length]);
+          }
+        }
+
+        syncTodayCommitment(todaySlot);
+      }
+
+      // Step 2: Distribute strictly the remaining chapters across Tomorrow -> Horizon End (zero duplicates)
+      if (daySlots.length > 1) {
+        const todayTheoryIdSet = new Set(todaySlot.theory.map(c => c.id));
+        const todayPyqIdSet = new Set(todaySlot.pyqs.map(c => c.id));
+
+        const futureNonDeferredTheory = orderedTodayEligibleTheory.filter(c => !todayTheoryIdSet.has(c.id));
+        const futurePyqs = remPyqAll.filter(c => !todayPyqIdSet.has(c.id));
+        const futureSlots = daySlots.slice(1);
+        const futureTotalWeight = futureSlots.reduce((acc, s) => acc + s.weight, 0) || 1;
+
+        let tCursor = 0;
+        let tAccum = 0;
+        futureSlots.forEach((slot, idx) => {
+          if (idx === 0 && deferredTheory.length > 0) {
+            slot.theory.push(...deferredTheory.filter(c => !todayTheoryIdSet.has(c.id)));
+          }
+          tAccum += (futureNonDeferredTheory.length * slot.weight) / futureTotalWeight;
+          const targetEnd = idx === futureSlots.length - 1
+            ? futureNonDeferredTheory.length
+            : Math.min(futureNonDeferredTheory.length, Math.round(tAccum));
+          while (tCursor < targetEnd) {
+            slot.theory.push(futureNonDeferredTheory[tCursor++]);
+          }
+        });
+
+        let pCursor = 0;
+        let pAccum = 0;
+        futureSlots.forEach((slot, idx) => {
+          pAccum += (futurePyqs.length * slot.weight) / futureTotalWeight;
+          const targetEnd = idx === futureSlots.length - 1
+            ? futurePyqs.length
+            : Math.min(futurePyqs.length, Math.round(pAccum));
+          while (pCursor < targetEnd) {
+            slot.pyqs.push(futurePyqs[pCursor++]);
+          }
+        });
+
+        let srIdx = todaySlot.sr.length;
+        futureSlots.forEach(slot => {
+          if (srPool.length === 0) return;
+          if (slot.qft && slot.qft.type === 'test') return;
+          const count = slot.qft ? 1 : Math.min(2, srPool.length);
+          for (let k = 0; k < count; k++) {
+            slot.sr.push(srPool[srIdx % srPool.length]);
+            srIdx++;
+          }
+        });
+      }
+
+      return daySlots;
+    }
+
+    function syncTodayCommitment(todaySlot) {
+      const iso = todaySlot.iso;
+      const inBufferPhase = iso > SPRINT_END && isBufferActive(iso);
+      let commit = state.dailyCommitments[iso];
+      if (!commit) {
+        // Carry forward unfulfilled overdue items from prior days.
+        // Once the Dec 16–20 buffer opens, Dec 15's leftover syllabus is evenly redistributed
+        // across all 5 buffer days rather than dumped onto Dec 16; missed buffer days still carry forward.
+        const overdueTheoryIds = [];
+        const overduePyqIds = [];
+        Object.keys(state.dailyCommitments || {}).sort().forEach(pastIso => {
+          if (pastIso >= iso) return;
+          if (inBufferPhase && pastIso <= SPRINT_END) return;
+          const c = state.dailyCommitments[pastIso];
+          if (!c) return;
+          (c.theoryIds || []).forEach(id => {
+            const ch = state.chapters.find(x => x.id === id);
+            if (ch && ch.theory !== 'Completed' && !overdueTheoryIds.includes(id)) overdueTheoryIds.push(id);
+          });
+          (c.pyqIds || []).forEach(id => {
+            const ch = state.chapters.find(x => x.id === id);
+            if (ch && ch.pyqs !== 'Completed' && !overduePyqIds.includes(id)) overduePyqIds.push(id);
+          });
+        });
+
+        commit = {
+          theoryIds: Array.from(new Set([...overdueTheoryIds, ...todaySlot.theory.map(c => c.id)])),
+          pyqIds: Array.from(new Set([...overduePyqIds, ...todaySlot.pyqs.map(c => c.id)])),
+          srIds: todaySlot.sr.map(c => c.id),
+          completedSrIds: [],
+          qftDone: false,
+          modeSnapshot: state.highWeightageFirst
+        };
+        state.dailyCommitments[iso] = commit;
+        state.pinnedTodayTheoryIds = [];
+        saveState();
+      } else {
+        const defSet = new Set(state.deferredTheoryIds || []);
+        commit.theoryIds = (commit.theoryIds || []).filter(id => !defSet.has(id));
+
+        if (commit.modeSnapshot !== state.highWeightageFirst) {
+          const doneTheory = (commit.theoryIds || []).filter(id => {
+            const c = state.chapters.find(x => x.id === id);
+            return c && c.theory === 'Completed';
+          });
+          const donePyqs = (commit.pyqIds || []).filter(id => {
+            const c = state.chapters.find(x => x.id === id);
+            return c && c.pyqs === 'Completed';
+          });
+          commit.theoryIds = Array.from(new Set([...doneTheory, ...todaySlot.theory.map(c => c.id)]));
+          commit.pyqIds = Array.from(new Set([...donePyqs, ...todaySlot.pyqs.map(c => c.id)]));
+          commit.modeSnapshot = state.highWeightageFirst;
+          saveState();
+        }
+      }
+
+      const validIds = new Set(state.chapters.map(c => c.id));
+      todaySlot.theory = (commit.theoryIds || [])
+        .filter(id => validIds.has(id))
+        .map(id => state.chapters.find(c => c.id === id))
+        .filter(c => c && c.theory !== 'Completed');
+
+      const followUpSet = new Set(state.recentTheoryDoneIds || []);
+      const combinedPyqIds = Array.from(new Set([...(commit.pyqIds || []), ...followUpSet]));
+      todaySlot.pyqs = combinedPyqIds
+        .filter(id => validIds.has(id))
+        .map(id => state.chapters.find(c => c.id === id))
+        .filter(c => c && c.theory === 'Completed' && c.pyqs !== 'Completed');
+
+      // Keep Today's card order synced with the active mode (High-Weightage First ON vs Original Plan OFF)
+      todaySlot.theory = getPrioritySortedChapters(todaySlot.theory, THEORY_PRIORITY_ORDER, state.highWeightageFirst);
+      todaySlot.pyqs = getPrioritySortedChapters(todaySlot.pyqs, PYQ_PRIORITY_ORDER, state.highWeightageFirst);
+
+      const doneSrSet = new Set(commit.completedSrIds || []);
+      todaySlot.sr = (commit.srIds || [])
+        .filter(id => validIds.has(id) && !doneSrSet.has(id))
+        .map(id => state.chapters.find(c => c.id === id))
+        .filter(Boolean);
+    }
+
+    function countCommitCompleted(iso, commit) {
+      let done = 0;
+      (commit.theoryIds || []).forEach(id => {
+        const ch = state.chapters.find(c => c.id === id);
+        if (ch && ch.theory === 'Completed') done++;
+      });
+      (commit.pyqIds || []).forEach(id => {
+        const ch = state.chapters.find(c => c.id === id);
+        if (ch && ch.pyqs === 'Completed') done++;
+      });
+      done += (commit.completedSrIds || []).length;
+      if (QUIZR_EVENTS[iso] && commit.qftDone) done++;
+      return done;
+    }
+
+    // =========================================================================
+    // 4. RENDER HEADER, THEME, PERSISTENT RED OVERDUE BANNER, & TODAY VIEW
+    // =========================================================================
+    function renderHeaderAndTheme() {
+      const todayIso = getStudyDateISO();
+      const bufferOn = isBufferActive(todayIso);
+
+      if (state.highWeightageFirst) {
+        document.body.classList.add('hw-theme');
+      } else {
+        document.body.classList.remove('hw-theme');
+      }
+
+      document.getElementById('header-date-sub').textContent = formatShortDate(todayIso);
+
+      const readyCount = state.chapters.filter(c => c.theory === 'Completed' && c.pyqs === 'Completed').length;
+      const meterEl = document.getElementById('nav-meter-compact');
+      if (bufferOn) {
+        meterEl.innerHTML = `<span class="text-amber-300">Buffer · Dec 20</span><span class="text-slate-600 mx-1">·</span><span>${readyCount}/81</span>`;
+      } else {
+        meterEl.textContent = `${readyCount}/81 Ready`;
+      }
+
+      const syncBadge = document.getElementById('sync-diff-badge');
+      if ((state.sessionSyncCount || 0) > 0) {
+        syncBadge.textContent = state.sessionSyncCount;
+        syncBadge.classList.remove('hidden');
+      } else {
+        syncBadge.classList.add('hidden');
+      }
+
+      [
+        { btn: 'hw-toggle-btn', dot: 'hw-toggle-dot', lbl: 'hw-toggle-label' },
+        { btn: 'hw-toggle-btn-road', dot: 'hw-toggle-dot-road', lbl: 'hw-toggle-label-road' }
+      ].forEach(ids => {
+        const btn = document.getElementById(ids.btn);
+        const dot = document.getElementById(ids.dot);
+        const lbl = document.getElementById(ids.lbl);
+        if (!btn) return;
+        if (state.highWeightageFirst) {
+          btn.className = 'px-3.5 py-2 rounded-xl bg-red-500/15 border border-red-500/40 text-xs font-semibold text-red-200 transition inline-flex items-center gap-2 shrink-0';
+          dot.className = 'w-2 h-2 rounded-full bg-red-400 shadow-[0_0_8px_#f87171]';
+          lbl.textContent = 'High-Weightage First: ON';
+        } else {
+          btn.className = 'px-3.5 py-2 rounded-xl bat-elevated border text-xs font-medium text-slate-300 hover:text-white transition inline-flex items-center gap-2 shrink-0';
+          dot.className = 'w-2 h-2 rounded-full bg-slate-500';
+          lbl.textContent = 'High-Weightage First: OFF';
+        }
+      });
+
+      // Persistent Overdue Accountability Banner:
+      // 1) All past days' unfulfilled commitments stay pinned in red until completed.
+      // 2) After 9:00 PM IST (21:00–04:59), shows an End-of-Day warning if today's targets remain open.
+      const banner = document.getElementById('overdue-banner');
+      const titleEl = document.getElementById('overdue-banner-title');
+      const textEl = document.getElementById('overdue-banner-text');
+
+      const overdueItems = [];
+      const inBufferPhase = bufferOn && todayIso > SPRINT_END;
+      Object.keys(state.dailyCommitments || {}).sort().forEach(iso => {
+        if (iso >= todayIso) return;
+        if (inBufferPhase && iso <= SPRINT_END) return;
+        const c = state.dailyCommitments[iso];
+        if (!c) return;
+        (c.theoryIds || []).forEach(id => {
+          const ch = state.chapters.find(x => x.id === id);
+          if (ch && ch.theory !== 'Completed') overdueItems.push(`${ch.name} (Theory)`);
+        });
+        (c.pyqIds || []).forEach(id => {
+          const ch = state.chapters.find(x => x.id === id);
+          if (ch && ch.pyqs !== 'Completed') overdueItems.push(`${ch.name} (PYQs)`);
+        });
+      });
+
+      if (overdueItems.length > 0) {
+        const uniqueOverdue = Array.from(new Set(overdueItems));
+        titleEl.textContent = 'Overdue From Yesterday — Complete Alongside Today’s Targets';
+        textEl.textContent = `Unfulfilled targets: ${uniqueOverdue.join(', ')}. Schedule rebalanced through ${bufferOn ? 'Dec 20' : 'Dec 15'}.`;
+        banner.classList.remove('hidden');
+      } else {
+        const istHour = getISTHour();
+        const isEndOfDay = istHour >= 21 || istHour < 5;
+        const todayCommit = state.dailyCommitments[todayIso];
+        const todayPending = [];
+        if (isEndOfDay && todayCommit) {
+          (todayCommit.theoryIds || []).forEach(id => {
+            const ch = state.chapters.find(x => x.id === id);
+            if (ch && ch.theory !== 'Completed') todayPending.push(`${ch.name} (Theory)`);
+          });
+          (todayCommit.pyqIds || []).forEach(id => {
+            const ch = state.chapters.find(x => x.id === id);
+            if (ch && ch.pyqs !== 'Completed') todayPending.push(`${ch.name} (PYQs)`);
+          });
+        }
+        if (todayPending.length > 0) {
+          titleEl.textContent = 'End-of-Day Alert — Targets Not Yet Fulfilled';
+          textEl.textContent = `Remaining before 5:00 AM IST rollover: ${todayPending.join(', ')}.`;
+          banner.classList.remove('hidden');
+        } else {
+          banner.classList.add('hidden');
+        }
+      }
+    }
+
+    function renderTodayView() {
+      const slots = generateDynamicSchedule();
+      const todaySlot = slots[0];
+      const todayIso = getStudyDateISO();
+      const bufferOn = isBufferActive(todayIso);
+      const horizonEnd = getActiveHorizonEnd(todayIso);
+      const dayNumber = Math.max(1, diffDaysISO(SPRINT_START, todayIso) + 1);
+      const totalSprintDays = Math.max(24, diffDaysISO(SPRINT_START, horizonEnd) + 1);
+
+      const dayPillEl = document.getElementById('today-day-pill');
+      if (isSyllabusComplete()) {
+        dayPillEl.textContent = 'Syllabus Complete ✓';
+        dayPillEl.className = 'px-2.5 py-0.5 rounded-md bg-emerald-500/15 border border-emerald-500/35 font-mono text-[11px] text-emerald-300';
+      } else if (bufferOn) {
+        dayPillEl.textContent = `Buffer · Day ${Math.min(dayNumber, totalSprintDays)} / ${totalSprintDays}`;
+        dayPillEl.className = 'px-2.5 py-0.5 rounded-md bg-amber-500/15 border border-amber-500/35 font-mono text-[11px] text-amber-300';
+      } else {
+        dayPillEl.textContent = `Day ${Math.min(dayNumber, totalSprintDays)} / ${totalSprintDays}`;
+        dayPillEl.className = 'px-2.5 py-0.5 rounded-md bat-elevated border font-mono text-[11px] text-slate-400';
+      }
+
+      // Silent 0-10 Mission Completion Bar
+      const commit = state.dailyCommitments[todayIso] || { theoryIds: [], pyqIds: [], srIds: [], completedSrIds: [], qftDone: false };
+      const totalTodayMissions = (commit.theoryIds?.length || 0) +
+        (commit.pyqIds?.length || 0) +
+        (commit.srIds?.length || 0) +
+        (todaySlot.qft ? 1 : 0);
+      const completedTodayMissions = countCommitCompleted(todayIso, commit);
+      const pct = totalTodayMissions === 0 ? 100 : Math.min(100, Math.round((completedTodayMissions / totalTodayMissions) * 100));
+
+      state.dailyRatings[todayIso] = totalTodayMissions === 0
+        ? 10
+        : Math.min(10, Math.max(0, Math.round((completedTodayMissions / totalTodayMissions) * 10)));
+      saveState();
+
+      const barEl = document.getElementById('today-mission-bar');
+      barEl.style.width = `${pct}%`;
+      if (pct >= 100) {
+        barEl.className = 'h-full rounded-full bg-emerald-400 shadow-[0_0_12px_rgba(52,211,153,0.5)] transition-all duration-500';
+      } else {
+        barEl.className = `h-full rounded-full ${state.highWeightageFirst ? 'bg-red-400' : 'bg-sky-400'} transition-all duration-500`;
+      }
+
+      const container = document.getElementById('today-sections-container');
+      const sectionsHTML = [];
+
+      // 00 · QFT Block
+      if (todaySlot.qft && !commit.qftDone) {
+        sectionsHTML.push(`
+          <div class="space-y-2.5">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-mono uppercase tracking-wider text-purple-400">00 · Quizr Full Test Block</span>
+              <span class="text-[11px] font-mono text-slate-500">Half Syllabus Load Today</span>
+            </div>
+            <div class="rounded-2xl bat-surface border border-purple-500/30 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div class="space-y-1">
+                <div class="flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-purple-400"></span>
+                  <h3 class="text-base font-semibold text-white">${escapeHtml(todaySlot.qft.title)}</h3>
+                </div>
+                <p class="text-xs text-slate-400">${escapeHtml(todaySlot.qft.subtitle)}</p>
+              </div>
+              <div class="flex items-center gap-2 shrink-0">
+                <button onclick="openFocusLock('qft', '${todaySlot.qft.testId}')" class="px-4 py-2 rounded-xl bg-purple-500 hover:bg-purple-400 text-xs font-semibold text-slate-950 transition">
+                  Enter Lock
+                </button>
+              </div>
+            </div>
+          </div>
+        `);
+      }
+
+      // 01 · Today's Theory Focus + Immediate Theory-to-PYQ Follow-Up Cards
+      const followUpChapters = (state.recentTheoryDoneIds || [])
+        .map(id => state.chapters.find(c => c.id === id))
+        .filter(c => c && c.theory === 'Completed' && c.pyqs !== 'Completed');
+
+      const followUpIdSet = new Set(followUpChapters.map(c => c.id));
+      const remainingPyqsForSection2 = todaySlot.pyqs.filter(c => !followUpIdSet.has(c.id));
+
+      sectionsHTML.push(`
+        <div class="space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-mono uppercase tracking-wider text-slate-400">01 · Today’s Theory Focus</span>
+            <button onclick="pullNextChapter('theory')" class="text-[11px] font-mono text-slate-400 hover:text-white transition">
+              + Pull Next Chapter
+            </button>
+          </div>
+          ${
+            (followUpChapters.length === 0 && todaySlot.theory.length === 0)
+              ? `<div class="rounded-2xl bat-surface border p-4 text-xs text-emerald-300/90 flex items-center justify-between">
+                  <span>✓ All scheduled Theory blocks for today are closed.</span>
+                  <button onclick="pullNextChapter('theory')" class="px-3 py-1 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] text-slate-200 font-medium transition">Grind Ahead +1</button>
+                </div>`
+              : `<div class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                  ${followUpChapters.map(ch => renderTheoryFollowUpPyqCard(ch)).join('')}
+                  ${todaySlot.theory.map(ch => renderTodayTheoryCard(ch)).join('')}
+                </div>`
+          }
+        </div>
+      `);
+
+      // 02 · MUST DO PYQs Closure
+      sectionsHTML.push(`
+        <div class="space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-mono uppercase tracking-wider text-slate-400">02 · MUST DO PYQs Closure</span>
+            <button onclick="pullNextChapter('pyqs')" class="text-[11px] font-mono text-slate-400 hover:text-white transition">
+              + Pull Next PYQ Set
+            </button>
+          </div>
+          ${
+            remainingPyqsForSection2.length === 0
+              ? `<div class="rounded-2xl bat-surface border p-4 text-xs text-emerald-300/90 flex items-center justify-between">
+                  <span>✓ All scheduled MUST DO PYQ sets for today are closed.</span>
+                  <button onclick="pullNextChapter('pyqs')" class="px-3 py-1 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] text-slate-200 font-medium transition">Grind Ahead +1</button>
+                </div>`
+              : `<div class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                  ${remainingPyqsForSection2.map(ch => renderTodayPyqCard(ch)).join('')}
+                </div>`
+          }
+        </div>
+      `);
+
+      // 03 · Spaced Repetition Sweep
+      if (todaySlot.sr.length > 0) {
+        sectionsHTML.push(`
+          <div class="space-y-2.5">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-mono uppercase tracking-wider text-slate-400">03 · Spaced Repetition Sweep (15-Min Recall)</span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              ${todaySlot.sr.map(ch => renderTodaySrCard(ch)).join('')}
+            </div>
+          </div>
+        `);
+      }
+
+      container.innerHTML = sectionsHTML.join('');
+    }
+
+    function renderTheoryFollowUpPyqCard(ch) {
+      const style = SUBJECT_STYLE[ch.subject] || SUBJECT_STYLE.Physics;
+      const isHw = HIGH_WEIGHTAGE_SET.has(ch.name);
+      return `
+        <div class="rounded-2xl bat-surface border border-emerald-500/35 p-4 sm:p-5 flex flex-col justify-between gap-4">
+          <div class="space-y-2">
+            <div class="flex items-center justify-between gap-2">
+              <span class="inline-flex items-center gap-1.5 text-[11px] font-mono text-emerald-300">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                Theory Done ✓ · Close PYQs Now
+              </span>
+              ${isHw ? `<span class="px-2 py-0.5 rounded-md text-[10px] font-mono bg-red-500/15 text-red-300 border border-red-500/30">High Wt</span>` : ''}
+            </div>
+            <h3 class="text-base font-semibold text-white">${escapeHtml(ch.name)}</h3>
+            <div class="flex items-center gap-2 text-[11px] font-mono text-slate-400">
+              <span class="${style.text}">${ch.subject}</span>
+              <span>·</span>
+              <span>${ch.mode}</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 pt-2 border-t border-[#191f2c]">
+            <button onclick="openFocusLock('pyqs', '${ch.id}')" class="w-full py-2.5 px-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-xs font-semibold text-slate-950 transition">
+              Complete MUST DO PYQs →
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderTodayTheoryCard(ch) {
+      const style = SUBJECT_STYLE[ch.subject] || SUBJECT_STYLE.Physics;
+      const isHw = HIGH_WEIGHTAGE_SET.has(ch.name);
+      return `
+        <div class="rounded-2xl bat-surface border ${isHw ? 'border-red-500/30 bg-red-950/[0.08]' : ''} p-4 sm:p-5 flex flex-col justify-between gap-4">
+          <div class="space-y-2">
+            <div class="flex items-center justify-between gap-2">
+              <span class="inline-flex items-center gap-1.5 text-[11px] font-mono ${style.text}">
+                <span class="w-1.5 h-1.5 rounded-full ${style.dot}"></span>
+                ${ch.subject} · ${ch.theory === 'Ongoing' ? 'Resume Loop' : 'Theory'}
+              </span>
+              ${isHw ? `<span class="px-2 py-0.5 rounded-md text-[10px] font-mono bg-red-500/15 text-red-300 border border-red-500/30">High Wt</span>` : ''}
+            </div>
+            <h3 class="text-base font-semibold text-white">${escapeHtml(ch.name)}</h3>
+            <p class="text-[11px] font-mono text-slate-400">${ch.mode}</p>
+          </div>
+          <div class="flex items-center gap-2 pt-2 border-t border-[#191f2c]">
+            <button onclick="openFocusLock('theory', '${ch.id}')" class="w-full py-2.5 px-3 rounded-xl bg-sky-500 hover:bg-sky-400 text-xs font-semibold text-slate-950 transition">
+              Complete Theory
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderTodayPyqCard(ch) {
+      const style = SUBJECT_STYLE[ch.subject] || SUBJECT_STYLE.Physics;
+      const isHw = HIGH_WEIGHTAGE_SET.has(ch.name);
+      return `
+        <div class="rounded-2xl bat-surface border ${isHw ? 'border-red-500/30 bg-red-950/[0.08]' : ''} p-4 sm:p-5 flex flex-col justify-between gap-4">
+          <div class="space-y-2">
+            <div class="flex items-center justify-between gap-2">
+              <span class="inline-flex items-center gap-1.5 text-[11px] font-mono ${style.text}">
+                <span class="w-1.5 h-1.5 rounded-full ${style.dot}"></span>
+                ${ch.subject} · ${ch.pyqs === 'Ongoing' ? 'Ongoing PYQs' : 'MUST DO PYQs'}
+              </span>
+              ${isHw ? `<span class="px-2 py-0.5 rounded-md text-[10px] font-mono bg-red-500/15 text-red-300 border border-red-500/30">High Wt</span>` : ''}
+            </div>
+            <h3 class="text-base font-semibold text-white">${escapeHtml(ch.name)}</h3>
+            <p class="text-[11px] font-mono text-slate-400">${ch.mode}</p>
+          </div>
+          <div class="flex items-center gap-2 pt-2 border-t border-[#191f2c]">
+            <button onclick="openFocusLock('pyqs', '${ch.id}')" class="w-full py-2.5 px-3 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10 text-xs font-semibold text-white transition">
+              Complete PYQs
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderTodaySrCard(ch) {
+      const style = SUBJECT_STYLE[ch.subject] || SUBJECT_STYLE.Physics;
+      return `
+        <div class="rounded-2xl bat-surface border p-3.5 flex items-center justify-between gap-3">
+          <div class="min-w-0">
+            <div class="flex items-center gap-1.5 text-[11px] font-mono ${style.text}">
+              <span class="w-1.5 h-1.5 rounded-full ${style.dot}"></span>
+              <span>${ch.subject}</span>
+            </div>
+            <p class="text-xs sm:text-sm font-medium text-white truncate mt-0.5">${escapeHtml(ch.name)}</p>
+          </div>
+          <button onclick="completeSrSweep('${ch.id}')" class="px-3 py-1.5 rounded-xl bat-elevated border hover:border-emerald-500/40 text-xs font-medium text-slate-300 hover:text-emerald-300 shrink-0 transition">
+            Revised ✓
+          </button>
+        </div>
+      `;
+    }
+
+    // =========================================================================
+    // 5. TASK COMPLETION, PULL AHEAD, & FOCUS LOCK HANDLERS
+    // =========================================================================
+    function logSessionSync(text) {
+      state.sessionSyncCount = (state.sessionSyncCount || 0) + 1;
+      if (!state.sessionCompletedLog) state.sessionCompletedLog = [];
+      if (!state.sessionCompletedLog.includes(text)) {
+        state.sessionCompletedLog.push(text);
+      }
+    }
+
+    function quickCompleteTheory(id) {
+      const ch = state.chapters.find(c => c.id === id);
+      if (!ch) return;
+      ch.theory = 'Completed';
+      if (ch.pyqs === 'Not Started') ch.pyqs = 'Ongoing';
+      state.deferredTheoryIds = (state.deferredTheoryIds || []).filter(x => x !== id);
+      if (ch.pyqs !== 'Completed' && !(state.recentTheoryDoneIds || []).includes(id)) {
+        state.recentTheoryDoneIds.unshift(id);
+      }
+      logSessionSync(`${ch.name} (Theory)`);
+      saveState();
+      renderAll();
+      showToast(`${ch.name} Theory Done ✓ — MUST DO PYQs pinned to top.`);
+    }
+
+    function quickCompletePyqs(id) {
+      const ch = state.chapters.find(c => c.id === id);
+      if (!ch) return;
+      ch.pyqs = 'Completed';
+      state.recentTheoryDoneIds = (state.recentTheoryDoneIds || []).filter(x => x !== id);
+      logSessionSync(`${ch.name} (PYQs)`);
+      saveState();
+      renderAll();
+      showToast(`${ch.name} MUST DO PYQs Completed ✓`);
+    }
+
+    function completeSrSweep(id) {
+      const todayIso = getStudyDateISO();
+      const commit = state.dailyCommitments[todayIso];
+      if (commit) {
+        commit.completedSrIds = commit.completedSrIds || [];
+        if (!commit.completedSrIds.includes(id)) commit.completedSrIds.push(id);
+      }
+      const ch = state.chapters.find(c => c.id === id);
+      if (ch) {
+        ch.srCount = (ch.srCount || 0) + 1;
+        logSessionSync(`${ch.name} (SR)`);
+      }
+      saveState();
+      renderAll();
+      showToast('Spaced repetition sweep logged ✓');
+    }
+
+    function markQftDone(testId) {
+      const todayIso = getStudyDateISO();
+      const commit = state.dailyCommitments[todayIso];
+      if (commit) commit.qftDone = true;
+      logSessionSync(`${testId.toUpperCase()} Completed`);
+      saveState();
+      renderAll();
+      if (QUIZR_EVENTS[todayIso] && QUIZR_EVENTS[todayIso].type === 'test') {
+        openScoreModal(testId);
+      } else {
+        showToast('QFT block completed ✓');
+      }
+    }
+
+    function pullNextChapter(type) {
+      const todayIso = getStudyDateISO();
+      const commit = state.dailyCommitments[todayIso];
+      if (!commit) return;
+
+      if (type === 'theory') {
+        const existing = new Set(commit.theoryIds || []);
+        const candidates = getPrioritySortedChapters(
+          state.chapters.filter(c => c.theory !== 'Completed' && !existing.has(c.id)),
+          THEORY_PRIORITY_ORDER,
+          state.highWeightageFirst
+        );
+        if (candidates.length === 0) {
+          showToast('All remaining Theory chapters are already queued!');
+          return;
+        }
+        commit.theoryIds.push(candidates[0].id);
+        saveState();
+        renderAll();
+        showToast(`Pulled ${candidates[0].name} (Theory) into Today.`);
+      } else {
+        const existing = new Set([...(commit.pyqIds || []), ...(state.recentTheoryDoneIds || [])]);
+        const candidates = getPrioritySortedChapters(
+          state.chapters.filter(c => c.theory === 'Completed' && c.pyqs !== 'Completed' && !existing.has(c.id)),
+          PYQ_PRIORITY_ORDER,
+          state.highWeightageFirst
+        );
+        if (candidates.length === 0) {
+          showToast('All Theory-completed chapters are already queued for PYQs!');
+          return;
+        }
+        commit.pyqIds.push(candidates[0].id);
+        saveState();
+        renderAll();
+        showToast(`Pulled ${candidates[0].name} (PYQs) into Today.`);
+      }
+    }
+
+    function toggleHighWeightageMode() {
+      state.highWeightageFirst = !state.highWeightageFirst;
+      saveState();
+      // Re-run full schedule + commitment sync immediately so Today and Roadmap stay 100% locked in sync
+      generateDynamicSchedule();
+      renderAll();
+      showToast(
+        state.highWeightageFirst
+          ? 'High-Weightage First: ON — 41 high-yield chapters prioritized first (all 81 scheduled).'
+          : 'High-Weightage First: OFF — restored original planned sequence & roadmap.'
+      );
+    }
+
+    // Focus Lock Controller
+    function openFocusLock(kind, targetId) {
+      ui.activeLock = { kind, targetId };
+      ui.lastCompletedTheoryChapterId = null;
+
+      const overlay = document.getElementById('lock-overlay');
+      const followUpBox = document.getElementById('lock-pyq-followup');
+      const actionsBar = document.getElementById('lock-actions-bar');
+      const deferBtn = document.getElementById('lock-defer-btn');
+      const hwBadge = document.getElementById('lock-hw-badge');
+
+      followUpBox.classList.add('hidden');
+      actionsBar.classList.remove('hidden');
+
+      let subjectKey = 'Physics';
+      let labelText = '';
+      let titleText = '';
+      let modeText = '';
+      let isHighWeightage = false;
+
+      if (kind === 'qft') {
+        const todayIso = getStudyDateISO();
+        const ev = QUIZR_EVENTS[todayIso] || { title: 'Quizr Full Test', subtitle: '3-Hour Mock + 90-Min Audit' };
+        subjectKey = 'QFT';
+        labelText = 'QUIZR · FULL TEST';
+        titleText = ev.title;
+        modeText = ev.subtitle;
+        deferBtn.classList.add('hidden');
+      } else {
+        const ch = state.chapters.find(c => c.id === targetId);
+        if (!ch) return;
+        subjectKey = ch.subject;
+        labelText = `${ch.subject.toUpperCase()} · ${kind === 'theory' ? 'THEORY' : 'MUST DO PYQS'}`;
+        titleText = ch.name;
+        modeText = ch.mode;
+        isHighWeightage = HIGH_WEIGHTAGE_SET.has(ch.name);
+        if (kind === 'theory') {
+          const todayIso = getStudyDateISO();
+          const isFinalDay = todayIso >= getActiveHorizonEnd(todayIso);
+          if (isFinalDay) deferBtn.classList.add('hidden');
+          else deferBtn.classList.remove('hidden');
+          if (ch.theory === 'Not Started') {
+            ch.theory = 'Ongoing';
+            saveState();
+          }
+        } else {
+          deferBtn.classList.add('hidden');
+          if (ch.pyqs === 'Not Started') {
+            ch.pyqs = 'Ongoing';
+            saveState();
+          }
+        }
+      }
+
+      const style = SUBJECT_STYLE[subjectKey] || SUBJECT_STYLE.Physics;
+      document.getElementById('lock-subject-dot').className = `w-2 h-2 rounded-full ${style.dot}`;
+      document.getElementById('lock-subject-dot').style.color = style.hex;
+      document.getElementById('lock-subject-text').textContent = labelText;
+      document.getElementById('lock-mode-pill').textContent = modeText;
+      document.getElementById('lock-title').textContent = titleText;
+      document.getElementById('lock-ring-outer').setAttribute('stroke', style.hex);
+      document.getElementById('lock-ring-inner').setAttribute('stroke', style.hex);
+      document.getElementById('lock-core-dot').style.backgroundColor = style.hex;
+      document.getElementById('lock-core-dot').style.color = style.hex;
+
+      const ambientHalo = document.getElementById('lock-ambient-halo');
+      if (ambientHalo) {
+        ambientHalo.style.background = `${style.hex}33`;
+      }
+      document.getElementById('lock-radial-glow').style.background =
+        `radial-gradient(circle at 50% 42%, ${style.hex}2b 0%, transparent 58%)`;
+
+      if (hwBadge) {
+        if (isHighWeightage) hwBadge.classList.remove('hidden');
+        else hwBadge.classList.add('hidden');
+      }
+
+      const primaryBtn = document.getElementById('lock-primary-btn');
+      primaryBtn.style.backgroundColor = style.hex;
+      primaryBtn.textContent = kind === 'theory' ? 'Theory Completed ✓' : kind === 'pyqs' ? 'PYQs Completed ✓' : 'Block Completed ✓';
+
+      cancelExitHold();
+      overlay.classList.remove('hidden');
+      overlay.classList.add('flex');
+    }
+
+    function startExitHold(e) {
+      if (e) {
+        if (e.button !== undefined && e.button !== 0) return;
+        e.preventDefault();
+      }
+      cancelExitHold();
+      ui.exitHoldStart = performance.now();
+
+      const fillEl = document.getElementById('lock-exit-fill');
+      const labelEl = document.getElementById('lock-exit-label');
+      const btnEl = document.getElementById('lock-exit-hold-btn');
+      if (btnEl) btnEl.classList.add('border-rose-500/60', 'text-rose-100');
+
+      const tick = (now) => {
+        const elapsed = now - ui.exitHoldStart;
+        const progress = Math.min(1, elapsed / EXIT_HOLD_DURATION_MS);
+        const remainingSec = Math.ceil((EXIT_HOLD_DURATION_MS - elapsed) / 1000);
+
+        if (fillEl) fillEl.style.width = `${(progress * 100).toFixed(1)}%`;
+        if (labelEl) labelEl.textContent = `Hold ${Math.max(1, remainingSec)}s...`;
+
+        if (progress >= 1) {
+          cancelExitHold();
+          exitFocusLock();
+          return;
+        }
+        ui.exitHoldRaf = requestAnimationFrame(tick);
+      };
+
+      ui.exitHoldRaf = requestAnimationFrame(tick);
+    }
+
+    function cancelExitHold() {
+      if (ui.exitHoldRaf) {
+        cancelAnimationFrame(ui.exitHoldRaf);
+        ui.exitHoldRaf = null;
+      }
+      ui.exitHoldStart = 0;
+      const fillEl = document.getElementById('lock-exit-fill');
+      const labelEl = document.getElementById('lock-exit-label');
+      const btnEl = document.getElementById('lock-exit-hold-btn');
+      if (fillEl) fillEl.style.width = '0%';
+      if (labelEl) labelEl.textContent = 'Hold 7s to Exit';
+      if (btnEl) btnEl.classList.remove('border-rose-500/50', 'text-rose-200');
+    }
+
+    function exitFocusLock() {
+      cancelExitHold();
+      const overlay = document.getElementById('lock-overlay');
+      overlay.classList.add('hidden');
+      overlay.classList.remove('flex');
+      ui.activeLock = null;
+      renderAll();
+    }
+
+    function completeLockedTask() {
+      if (!ui.activeLock) return;
+      const { kind, targetId } = ui.activeLock;
+
+      if (kind === 'qft') {
+        exitFocusLock();
+        markQftDone(targetId);
+        return;
+      }
+
+      if (kind === 'theory') {
+        const ch = state.chapters.find(c => c.id === targetId);
+        quickCompleteTheory(targetId);
+        if (ch && ch.pyqs !== 'Completed') {
+          ui.lastCompletedTheoryChapterId = targetId;
+          document.getElementById('lock-followup-text').textContent =
+            `Launch ${ch.name} MUST DO PYQs right now while formulas are fresh?`;
+          document.getElementById('lock-actions-bar').classList.add('hidden');
+          document.getElementById('lock-pyq-followup').classList.remove('hidden');
+          return;
+        }
+        exitFocusLock();
+        return;
+      }
+
+      if (kind === 'pyqs') {
+        quickCompletePyqs(targetId);
+        exitFocusLock();
+      }
+    }
+
+    function launchFollowUpPyqs() {
+      if (!ui.lastCompletedTheoryChapterId) {
+        exitFocusLock();
+        return;
+      }
+      openFocusLock('pyqs', ui.lastCompletedTheoryChapterId);
+    }
+
+    function deferLockedTask() {
+      if (!ui.activeLock || ui.activeLock.kind !== 'theory') return;
+      const id = ui.activeLock.targetId;
+      const todayIso = getStudyDateISO();
+      if (todayIso >= getActiveHorizonEnd(todayIso)) {
+        showToast('Final day of sprint — close this chapter today.');
+        return;
+      }
+      const commit = state.dailyCommitments[todayIso];
+      if (commit) {
+        commit.theoryIds = (commit.theoryIds || []).filter(x => x !== id);
+      }
+      if (!(state.deferredTheoryIds || []).includes(id)) {
+        state.deferredTheoryIds.push(id);
+      }
+      saveState();
+      exitFocusLock();
+      showToast('Pinned to the front of Tomorrow on your Roadmap.');
+    }
+
+    // =========================================================================
+    // 6. ROADMAP VIEW (WINDING HIGHWAY + POPUP PREVIEW + 0–10 RATINGS)
+    // =========================================================================
+    function getHighwayPoint(t) {
+      // Exact cubic Bezier matching M 44 170 C 175 170, 215 58, 430 58 C 645 58, 685 170, 816 170
+      if (t <= 0.5) {
+        const u = t * 2;
+        const p0 = { x: 44, y: 170 }, p1 = { x: 175, y: 170 }, p2 = { x: 215, y: 58 }, p3 = { x: 430, y: 58 };
+        const m = 1 - u;
+        return {
+          x: m*m*m*p0.x + 3*m*m*u*p1.x + 3*m*u*u*p2.x + u*u*u*p3.x,
+          y: m*m*m*p0.y + 3*m*m*u*p1.y + 3*m*u*u*p2.y + u*u*u*p3.y
+        };
+      } else {
+        const u = (t - 0.5) * 2;
+        const p0 = { x: 430, y: 58 }, p1 = { x: 645, y: 58 }, p2 = { x: 685, y: 170 }, p3 = { x: 816, y: 170 };
+        const m = 1 - u;
+        return {
+          x: m*m*m*p0.x + 3*m*m*u*p1.x + 3*m*u*u*p2.x + u*u*u*p3.x,
+          y: m*m*m*p0.y + 3*m*m*u*p1.y + 3*m*u*u*p2.y + u*u*u*p3.y
+        };
+      }
+    }
+
+    function updateHighwayIlluminatedTrail(idx, totalDays) {
+      const progressPath = document.getElementById('highway-progress-path');
+      const progressGlow = document.getElementById('highway-progress-glow');
+      if (!progressPath || !progressGlow) return;
+
+      const accent = state.highWeightageFirst ? '#ef4444' : '#38bdf8';
+      progressPath.setAttribute('stroke', accent);
+      progressGlow.setAttribute('stroke', accent);
+
+      const rawLen = typeof progressPath.getTotalLength === 'function' ? progressPath.getTotalLength() : 0;
+      const len = rawLen > 0 ? rawLen : 910;
+      const frac = totalDays <= 1 ? 1 : Math.max(0.015, idx / (totalDays - 1));
+      const offset = len * (1 - frac);
+
+      [progressPath, progressGlow].forEach(el => {
+        el.style.strokeDasharray = `${len}`;
+        el.style.strokeDashoffset = `${offset}`;
+      });
+    }
+
+    function renderHighwayNodesAndTether(days, activeIdx) {
+      const totalTimelineDays = days.length;
+      const accent = state.highWeightageFirst ? '#ef4444' : '#38bdf8';
+      const nodesSVG = [];
+      let tetherSVG = '';
+
+      days.forEach((d, i) => {
+        const t = totalTimelineDays <= 1 ? 0 : i / (totalTimelineDays - 1);
+        const pt = getHighwayPoint(t);
+        const isSelected = i === activeIdx;
+        const isQftTest = d.qft && d.qft.type === 'test';
+        const isQftPrep = d.qft && d.qft.type === 'prep';
+
+        const fillCol = isQftTest
+          ? '#c084fc'
+          : isQftPrep
+            ? '#a855f7'
+            : d.isToday
+              ? accent
+              : d.isPast
+                ? '#34d399'
+                : d.iso > SPRINT_END
+                  ? '#f59e0b'
+                  : '#64748b';
+
+        if (isSelected) {
+          tetherSVG = `
+            <line x1="${pt.x}" y1="0" x2="${pt.x}" y2="${pt.y - 12}" stroke="${fillCol}" stroke-width="1.5" stroke-dasharray="3 4" opacity="0.65" />
+            <circle cx="${pt.x}" cy="2" r="2.5" fill="${fillCol}" opacity="0.85" />
+          `;
+        }
+
+        // QFT Sunday Pit-Stop Callout Tag right below the road
+        const qftLabel = isQftTest
+          ? `<g transform="translate(${pt.x}, ${pt.y + 29})">
+               <rect x="-22" y="-9" width="44" height="16" rx="5" fill="#1e1033" stroke="#a855f7" stroke-width="1" />
+               <text x="0" y="2.5" text-anchor="middle" fill="#e9d5ff" font-size="9" font-weight="600" font-family="JetBrains Mono">${escapeHtml(d.qft.testId.toUpperCase())}</text>
+             </g>`
+          : '';
+
+        if (isSelected) {
+          // Circular Road Slider Handle (Draggable directly along the winding highway)
+          nodesSVG.push(`
+            <g class="cursor-grab active:cursor-grabbing">
+              <circle cx="${pt.x}" cy="${pt.y}" r="18" fill="transparent" />
+              <circle cx="${pt.x}" cy="${pt.y}" r="13" fill="${fillCol}" class="road-beacon-ping" />
+              <circle cx="${pt.x}" cy="${pt.y}" r="14" fill="none" stroke="${fillCol}" stroke-width="1.5" opacity="0.55" />
+              <circle cx="${pt.x}" cy="${pt.y}" r="10" fill="#070a10" stroke="${fillCol}" stroke-width="3" />
+              <circle cx="${pt.x}" cy="${pt.y}" r="3.5" fill="#ffffff" />
+              ${qftLabel}
+            </g>
+          `);
+        } else {
+          const baseRadius = isQftTest ? 6 : d.isToday ? 5.5 : 3.5;
+          nodesSVG.push(`
+            <g class="cursor-pointer">
+              <circle cx="${pt.x}" cy="${pt.y}" r="12" fill="transparent" />
+              <circle cx="${pt.x}" cy="${pt.y}" r="${baseRadius}" fill="${fillCol}" stroke="#050608" stroke-width="2" />
+              ${qftLabel}
+            </g>
+          `);
+        }
+      });
+
+      document.getElementById('highway-tether-group').innerHTML = tetherSVG;
+      document.getElementById('highway-nodes-group').innerHTML = nodesSVG.join('');
+      updateHighwayIlluminatedTrail(activeIdx, totalTimelineDays);
+    }
+
+    function getNearestRoadIndexFromPointer(e) {
+      const svg = document.getElementById('highway-svg');
+      const days = ui.cachedRoadmapDays || [];
+      if (!svg || days.length === 0) return ui.selectedRoadIdx;
+
+      let svgX = 430;
+      let svgY = 120;
+      const ctm = typeof svg.getScreenCTM === 'function' ? svg.getScreenCTM() : null;
+      if (ctm && typeof svg.createSVGPoint === 'function') {
+        const p = svg.createSVGPoint();
+        p.x = e.clientX;
+        p.y = e.clientY;
+        const local = p.matrixTransform(ctm.inverse());
+        svgX = local.x;
+        svgY = local.y;
+      } else {
+        const rect = svg.getBoundingClientRect();
+        if (!rect.width || !rect.height) return ui.selectedRoadIdx;
+        svgX = ((e.clientX - rect.left) / rect.width) * 860;
+        svgY = ((e.clientY - rect.top) / rect.height) * 235;
+      }
+
+      let bestIdx = 0;
+      let bestDistSq = Infinity;
+      const total = days.length;
+      for (let i = 0; i < total; i++) {
+        const t = total <= 1 ? 0 : i / (total - 1);
+        const pt = getHighwayPoint(t);
+        const dx = pt.x - svgX;
+        const dy = (pt.y - svgY) * 0.45;
+        const distSq = dx * dx + dy * dy;
+        if (distSq < bestDistSq) {
+          bestDistSq = distSq;
+          bestIdx = i;
+        }
+      }
+      return bestIdx;
+    }
+
+    function startHighwayDrag(e) {
+      if (e.button !== undefined && e.button !== 0) return;
+      ui.isDraggingRoad = true;
+      const svg = document.getElementById('highway-svg');
+      if (svg && typeof svg.setPointerCapture === 'function') {
+        try { svg.setPointerCapture(e.pointerId); } catch (_) {}
+      }
+      const idx = getNearestRoadIndexFromPointer(e);
+      onRoadmapSliderChange(idx);
+    }
+
+    function moveHighwayDrag(e) {
+      if (!ui.isDraggingRoad) return;
+      const idx = getNearestRoadIndexFromPointer(e);
+      if (idx !== ui.selectedRoadIdx) {
+        onRoadmapSliderChange(idx);
+      }
+    }
+
+    function endHighwayDrag(e) {
+      if (!ui.isDraggingRoad) return;
+      ui.isDraggingRoad = false;
+      const svg = document.getElementById('highway-svg');
+      if (svg && typeof svg.releasePointerCapture === 'function') {
+        try { svg.releasePointerCapture(e.pointerId); } catch (_) {}
+      }
+    }
+
+    function renderRoadmapView() {
+      const todayIso = getStudyDateISO();
+      const bufferOn = isBufferActive(todayIso);
+      const horizonEnd = getActiveHorizonEnd(todayIso);
+
+      const phaseTag = document.getElementById('roadmap-phase-tag');
+      const finishText = document.getElementById('highway-finish-text');
+
+      if (bufferOn) {
+        phaseTag.textContent = 'Reserve Buffer Active · Extended to Dec 20';
+        phaseTag.className = 'text-[11px] font-mono uppercase tracking-wider text-amber-400';
+        finishText.textContent = 'DEC 20 ⚑';
+        finishText.setAttribute('fill', '#fbbf24');
+      } else {
+        phaseTag.textContent = '24-Day Closure Sprint · Ends Dec 15';
+        phaseTag.className = `text-[11px] font-mono uppercase tracking-wider ${state.highWeightageFirst ? 'text-red-400' : 'text-sky-400'}`;
+        finishText.textContent = 'DEC 15 ⚑';
+        finishText.setAttribute('fill', '#e2e8f0');
+      }
+
+      renderFullTestCards();
+
+      const dynamicSlots = generateDynamicSchedule();
+      const dynamicMap = {};
+      dynamicSlots.forEach(s => { dynamicMap[s.iso] = s; });
+
+      const totalTimelineDays = diffDaysISO(SPRINT_START, horizonEnd) + 1;
+      if (ui.selectedRoadIdx >= totalTimelineDays) {
+        ui.selectedRoadIdx = totalTimelineDays - 1;
+      }
+
+      const timelineData = [];
+      const timelineItems = [];
+
+      for (let i = 0; i < totalTimelineDays; i++) {
+        const iso = addDaysISO(SPRINT_START, i);
+        const isPast = iso < todayIso;
+        const isToday = iso === todayIso;
+        const slot = dynamicMap[iso] || null;
+        const rating = state.dailyRatings[iso];
+        const qft = QUIZR_EVENTS[iso] || null;
+
+        const theoryList = slot ? slot.theory : [];
+        const pyqList = slot ? slot.pyqs : [];
+        timelineData.push({ idx: i, iso, isPast, isToday, qft, theoryList, pyqList, rating });
+
+        // Rating badge for completed / active days
+        let badgeHTML = '';
+        if (isPast || (isToday && typeof rating === 'number')) {
+          const score = typeof rating === 'number' ? rating : 10;
+          const colorCls = score >= 8
+            ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
+            : score >= 5
+              ? 'bg-amber-500/15 text-amber-300 border-amber-500/30'
+              : 'bg-rose-500/15 text-rose-300 border-rose-500/30';
+          badgeHTML = `<span class="px-2 py-0.5 rounded-md font-mono text-[11px] border ${colorCls}">${score}/10</span>`;
+        } else if (iso > SPRINT_END) {
+          badgeHTML = `<span class="px-2 py-0.5 rounded-md font-mono text-[10px] bg-amber-500/15 text-amber-300 border border-amber-500/30">Buffer</span>`;
+        }
+
+        const mileDotClass = qft
+          ? 'bg-purple-400 shadow-[0_0_10px_#c084fc] border-[#050608]'
+          : isToday
+            ? (state.highWeightageFirst ? 'bg-red-400 shadow-[0_0_12px_#f87171] border-[#050608]' : 'bg-sky-400 shadow-[0_0_12px_#38bdf8] border-[#050608]')
+            : isPast
+              ? 'bg-emerald-400 border-[#050608]'
+              : 'bg-slate-600 border-[#050608]';
+
+        timelineItems.push(`
+          <div class="relative">
+            <!-- Milepost Marker Anchored Directly on the Vertical Asphalt Road -->
+            <span class="pointer-events-none absolute -left-[34px] sm:-left-[44px] top-4 w-3.5 h-3.5 rounded-full border-2 ${mileDotClass} z-10"></span>
+            <span class="pointer-events-none absolute -left-[20px] sm:-left-[30px] top-[22px] w-5 sm:w-7 h-[1.5px] ${isToday ? (state.highWeightageFirst ? 'bg-red-500/50' : 'bg-sky-500/50') : 'bg-[#1f293b]'}"></span>
+
+            <div id="road-day-${i}" onclick="onRoadmapSliderChange(${i})" class="cursor-pointer rounded-2xl border p-3.5 sm:p-4 transition ${
+              isToday
+                ? (state.highWeightageFirst ? 'bg-red-950/20 border-red-500/45' : 'bg-sky-950/20 border-sky-500/45')
+                : isPast
+                  ? 'bat-surface opacity-75 hover:opacity-100'
+                  : 'bat-surface hover:border-white/15'
+            }">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <div class="flex items-center gap-2.5">
+                  <span class="font-mono text-xs font-semibold text-white">Day ${i + 1} · ${formatShortDate(iso)}</span>
+                  ${isToday ? `<span class="px-2 py-0.5 rounded-md text-[10px] font-mono uppercase bg-white/10 text-white">Today</span>` : ''}
+                  ${qft ? `<span class="px-2 py-0.5 rounded-md text-[10px] font-mono bg-purple-500/15 text-purple-300 border border-purple-500/30">${escapeHtml(qft.title)}</span>` : ''}
+                </div>
+                <div class="flex items-center gap-2">
+                  ${badgeHTML}
+                </div>
+              </div>
+
+              ${
+                isPast
+                  ? `<p class="text-xs text-slate-400 mt-2">Completed day logged · Productivity score: <span class="font-mono text-slate-200">${typeof rating === 'number' ? rating : 10}/10</span></p>`
+                  : `<div class="mt-2.5 grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                      <div>
+                        <span class="text-[10px] font-mono uppercase text-slate-500">Theory (${theoryList.length})</span>
+                        <p class="text-slate-300 mt-0.5 leading-relaxed">${
+                          theoryList.length > 0
+                            ? theoryList.map(c => HIGH_WEIGHTAGE_SET.has(c.name) ? `<span class="text-red-300">${escapeHtml(c.name)}</span>` : escapeHtml(c.name)).join(' · ')
+                            : '<span class="text-slate-500">Revision / Buffer</span>'
+                        }</p>
+                      </div>
+                      <div>
+                        <span class="text-[10px] font-mono uppercase text-slate-500">MUST DO PYQs (${pyqList.length})</span>
+                        <p class="text-slate-300 mt-0.5 leading-relaxed">${
+                          pyqList.length > 0
+                            ? pyqList.map(c => HIGH_WEIGHTAGE_SET.has(c.name) ? `<span class="text-red-300">${escapeHtml(c.name)}</span>` : escapeHtml(c.name)).join(' · ')
+                            : '<span class="text-slate-500">Full Mock / Audit</span>'
+                        }</p>
+                      </div>
+                    </div>`
+              }
+            </div>
+          </div>
+        `);
+      }
+
+      ui.cachedRoadmapDays = timelineData;
+      document.getElementById('highway-timeline-container').innerHTML = timelineItems.join('');
+
+      renderHighwayNodesAndTether(timelineData, ui.selectedRoadIdx);
+      // Position floating preview box above selected stop without auto-scrolling until clicked
+      updateRoadPopupPreview(ui.selectedRoadIdx);
+    }
+
+    function updateRoadPopupPreview(idx) {
+      const days = ui.cachedRoadmapDays || [];
+      const item = days[idx];
+      if (!item) return;
+
+      const total = days.length;
+      const t = total <= 1 ? 0 : idx / (total - 1);
+      const pt = getHighwayPoint(t);
+
+      const popup = document.getElementById('road-popup-box');
+      const stage = document.getElementById('highway-stage');
+      if (popup && stage) {
+        const stageW = stage.clientWidth || 640;
+        const popupW = popup.offsetWidth || 260;
+        const targetPx = (pt.x / 860) * stageW;
+        const minPx = popupW / 2 + 12;
+        const maxPx = Math.max(minPx, stageW - popupW / 2 - 12);
+        const clampedPx = Math.max(minPx, Math.min(maxPx, targetPx));
+        popup.style.left = `${clampedPx}px`;
+        popup.style.transform = 'translateX(-50%)';
+      }
+
+      const statusDot = document.getElementById('popup-status-dot');
+      if (statusDot) {
+        statusDot.className = item.qft
+          ? 'w-2 h-2 rounded-full bg-purple-400 shrink-0'
+          : item.isToday
+            ? `w-2 h-2 rounded-full ${state.highWeightageFirst ? 'bg-red-400' : 'bg-sky-400'} shrink-0`
+            : item.isPast
+              ? 'w-2 h-2 rounded-full bg-emerald-400 shrink-0'
+              : 'w-2 h-2 rounded-full bg-slate-500 shrink-0';
+      }
+
+      const sliderLabel = document.getElementById('slider-active-label');
+      const popupTitle = document.getElementById('popup-day-title');
+      const bodyEl = document.getElementById('popup-chapters-body');
+      if (sliderLabel) sliderLabel.textContent = `Day ${idx + 1} · ${formatShortDate(item.iso)}`;
+      if (popupTitle) popupTitle.textContent = `Day ${idx + 1} · ${formatShortDate(item.iso)}`;
+
+      if (bodyEl) {
+        if (item.isPast) {
+          const sc = typeof item.rating === 'number' ? item.rating : 10;
+          bodyEl.innerHTML = `<span class="text-emerald-300 font-mono">Logged · ${sc}/10 productivity</span>`;
+        } else {
+          const parts = [];
+          if (item.qft) parts.push(`<span class="text-purple-300 font-semibold">${escapeHtml(item.qft.title)}</span>`);
+          if (item.theoryList.length > 0) parts.push(`<span class="text-sky-300">TH:</span> ${item.theoryList.map(c => escapeHtml(c.name)).join(', ')}`);
+          if (item.pyqList.length > 0) parts.push(`<span class="text-emerald-300">PYQ:</span> ${item.pyqList.map(c => escapeHtml(c.name)).join(', ')}`);
+          bodyEl.innerHTML = parts.length > 0 ? parts.join(' · ') : 'Revision / Buffer slot';
+        }
+      }
+    }
+
+    function onRoadmapSliderChange(idxStr) {
+      const idx = parseInt(idxStr, 10);
+      ui.selectedRoadIdx = idx;
+      // Re-render SVG road trail, draggable handle, tether & floating pop-up box ONLY (no scroll until box is clicked)
+      renderHighwayNodesAndTether(ui.cachedRoadmapDays || [], idx);
+      updateRoadPopupPreview(idx);
+    }
+
+    function stepRoadmapSlider(delta) {
+      const max = (ui.cachedRoadmapDays?.length || 1) - 1;
+      const next = Math.max(0, Math.min(max, ui.selectedRoadIdx + delta));
+      onRoadmapSliderChange(next);
+    }
+
+    function jumpToSelectedRoadCard() {
+      const el = document.getElementById(`road-day-${ui.selectedRoadIdx}`);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.classList.remove('road-card-flash');
+        void el.offsetWidth;
+        el.classList.add('road-card-flash');
+      }
+    }
+
+    // =========================================================================
+    // 7. FULL TEST SCOREBOARD & SVG PERFORMANCE GRAPH
+    // =========================================================================
+    function renderFullTestCards() {
+      const grid = document.getElementById('full-test-cards-grid');
+      const tests = state.testScores || [];
+
+      grid.innerHTML = tests.map((t, idx) => {
+        const hasScore = typeof t.total === 'number' && !Number.isNaN(t.total);
+        let deltaHTML = '';
+        if (hasScore && idx > 0 && typeof tests[idx - 1].total === 'number') {
+          const diff = t.total - tests[idx - 1].total;
+          deltaHTML = diff >= 0
+            ? `<span class="text-[11px] font-mono text-emerald-400">+${diff}</span>`
+            : `<span class="text-[11px] font-mono text-rose-400">${diff}</span>`;
+        }
+
+        return `
+          <div onclick="openScoreModal('${t.id}')" class="cursor-pointer rounded-xl bat-elevated border hover:border-purple-500/40 p-3.5 transition flex flex-col justify-between gap-2.5">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-white">${escapeHtml(t.name)}</span>
+              <span class="text-[11px] font-mono text-slate-400">${formatShortDate(t.date)}</span>
+            </div>
+
+            ${
+              hasScore
+                ? `<div class="space-y-1">
+                    <div class="flex items-baseline justify-between">
+                      <span class="text-xl font-mono font-bold text-purple-300">${t.total}<span class="text-xs text-slate-500">/300</span></span>
+                      ${deltaHTML}
+                    </div>
+                    <p class="text-[11px] font-mono text-slate-400">
+                      P:${t.phy ?? '-'} · C:${t.chem ?? '-'} · M:${t.math ?? '-'}
+                    </p>
+                    ${t.note ? `<p class="text-[11px] text-slate-400 truncate">${escapeHtml(t.note)}</p>` : ''}
+                  </div>`
+                : `<div class="py-2 flex items-center justify-between text-xs text-slate-500">
+                    <span>Not logged yet</span>
+                    <span class="text-purple-400 font-medium">Log →</span>
+                  </div>`
+            }
+          </div>
+        `;
+      }).join('');
+    }
+
+    function openScoreModal(testId) {
+      const existing = (state.testScores || []).find(t => t.id === testId);
+      document.getElementById('score-test-id').value = existing ? existing.id : `mock-${Date.now()}`;
+      document.getElementById('score-modal-title').textContent = existing ? `Update ${existing.name}` : 'Log Full Test Score';
+      document.getElementById('score-test-name').value = existing ? existing.name : `Mock #${(state.testScores?.length || 0) + 1}`;
+      document.getElementById('score-test-date').value = existing ? existing.date : getStudyDateISO();
+      document.getElementById('score-phy').value = existing && existing.phy !== null ? existing.phy : '';
+      document.getElementById('score-chem').value = existing && existing.chem !== null ? existing.chem : '';
+      document.getElementById('score-math').value = existing && existing.math !== null ? existing.math : '';
+      document.getElementById('score-total').value = existing && existing.total !== null ? existing.total : '';
+      document.getElementById('score-note').value = existing ? (existing.note || '') : '';
+
+      const m = document.getElementById('score-modal');
+      m.classList.remove('hidden');
+      m.classList.add('flex');
+    }
+
+    function closeScoreModal() {
+      const m = document.getElementById('score-modal');
+      m.classList.add('hidden');
+      m.classList.remove('flex');
+    }
+
+    function autoSumModalScore() {
+      const p = parseInt(document.getElementById('score-phy').value, 10);
+      const c = parseInt(document.getElementById('score-chem').value, 10);
+      const m = parseInt(document.getElementById('score-math').value, 10);
+      if (!Number.isNaN(p) || !Number.isNaN(c) || !Number.isNaN(m)) {
+        document.getElementById('score-total').value = (Number.isNaN(p) ? 0 : p) + (Number.isNaN(c) ? 0 : c) + (Number.isNaN(m) ? 0 : m);
+      }
+    }
+
+    function saveTestScore() {
+      const id = document.getElementById('score-test-id').value;
+      const name = document.getElementById('score-test-name').value.trim() || 'Full Test';
+      const date = document.getElementById('score-test-date').value || getStudyDateISO();
+      const phyRaw = document.getElementById('score-phy').value;
+      const chemRaw = document.getElementById('score-chem').value;
+      const mathRaw = document.getElementById('score-math').value;
+      const totRaw = document.getElementById('score-total').value;
+      const note = document.getElementById('score-note').value.trim();
+
+      const phy = phyRaw === '' ? null : parseInt(phyRaw, 10);
+      const chem = chemRaw === '' ? null : parseInt(chemRaw, 10);
+      const math = mathRaw === '' ? null : parseInt(mathRaw, 10);
+      const total = totRaw === '' ? null : parseInt(totRaw, 10);
+
+      const entry = { id, name, date, phy, chem, math, total, note };
+      const idx = state.testScores.findIndex(t => t.id === id);
+      if (idx >= 0) {
+        state.testScores[idx] = entry;
+      } else {
+        state.testScores.push(entry);
+      }
+
+      if (total !== null) {
+        logSessionSync(`${name}: ${total}/300`);
+      }
+
+      saveState();
+      closeScoreModal();
+      renderAll();
+      showToast(`Saved ${name} score ✓`);
+    }
+
+    function openScoreGraph() {
+      const m = document.getElementById('graph-modal');
+      m.classList.remove('hidden');
+      m.classList.add('flex');
+      renderScoreGraph();
+    }
+
+    function closeScoreGraph() {
+      const m = document.getElementById('graph-modal');
+      m.classList.add('hidden');
+      m.classList.remove('flex');
+    }
+
+    function setGraphMode(mode) {
+      ui.graphMode = mode;
+      document.getElementById('graph-mode-total').className = mode === 'total'
+        ? 'px-2.5 py-1 rounded-lg text-xs font-semibold bg-purple-500/20 text-purple-300 transition'
+        : 'px-2.5 py-1 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition';
+      document.getElementById('graph-mode-pcm').className = mode === 'pcm'
+        ? 'px-2.5 py-1 rounded-lg text-xs font-semibold bg-purple-500/20 text-purple-300 transition'
+        : 'px-2.5 py-1 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition';
+      renderScoreGraph();
+    }
+
+    function renderScoreGraph() {
+      const scored = (state.testScores || []).filter(t => typeof t.total === 'number' && !Number.isNaN(t.total));
+      const statsEl = document.getElementById('graph-stats-bar');
+      const chartEl = document.getElementById('graph-svg-container');
+
+      if (scored.length === 0) {
+        statsEl.innerHTML = '';
+        chartEl.innerHTML = `<div class="py-12 text-center text-xs text-slate-400">No full test scores logged yet. Click <span class="text-purple-300 font-semibold">+ Log Score</span> after QFT-1 on Nov 29 to plot your trajectory.</div>`;
+        return;
+      }
+
+      const totals = scored.map(t => t.total);
+      const latest = totals[totals.length - 1];
+      const best = Math.max(...totals);
+      const avg = Math.round(totals.reduce((a, b) => a + b, 0) / totals.length);
+      const delta = totals.length > 1 ? latest - totals[0] : 0;
+
+      statsEl.innerHTML = `
+        <div class="rounded-xl bat-elevated border p-2.5">
+          <span class="text-[10px] font-mono text-slate-500">LATEST</span>
+          <p class="text-sm font-mono font-semibold text-white mt-0.5">${latest}/300</p>
+        </div>
+        <div class="rounded-xl bat-elevated border p-2.5">
+          <span class="text-[10px] font-mono text-slate-500">BEST</span>
+          <p class="text-sm font-mono font-semibold text-emerald-300 mt-0.5">${best}/300</p>
+        </div>
+        <div class="rounded-xl bat-elevated border p-2.5">
+          <span class="text-[10px] font-mono text-slate-500">AVERAGE</span>
+          <p class="text-sm font-mono font-semibold text-purple-300 mt-0.5">${avg}/300</p>
+        </div>
+        <div class="rounded-xl bat-elevated border p-2.5">
+          <span class="text-[10px] font-mono text-slate-500">NET TREND</span>
+          <p class="text-sm font-mono font-semibold ${delta >= 0 ? 'text-emerald-400' : 'text-rose-400'} mt-0.5">${delta >= 0 ? '+' : ''}${delta}</p>
+        </div>
+      `;
+
+      const W = 600, H = 220, padL = 38, padR = 24, padT = 20, padB = 34;
+      const plotW = W - padL - padR;
+      const plotH = H - padT - padB;
+      const maxVal = ui.graphMode === 'total' ? 300 : 100;
+
+      const getX = i => scored.length === 1 ? padL + plotW / 2 : padL + (i / (scored.length - 1)) * plotW;
+      const getY = val => padT + plotH - (Math.max(0, Math.min(maxVal, val)) / maxVal) * plotH;
+
+      const gridSteps = ui.graphMode === 'total' ? [0, 100, 200, 300] : [0, 33, 66, 100];
+      const gridSVG = gridSteps.map(v => {
+        const y = getY(v);
+        return `
+          <line x1="${padL}" y1="${y}" x2="${W - padR}" y2="${y}" stroke="rgba(255,255,255,0.06)" stroke-dasharray="3 3" />
+          <text x="${padL - 8}" y="${y + 3}" text-anchor="end" fill="#64748b" font-size="10" font-family="JetBrains Mono">${v}</text>
+        `;
+      }).join('');
+
+      const xLabelsSVG = scored.map((t, i) => `
+        <text x="${getX(i)}" y="${H - 10}" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="JetBrains Mono">${escapeHtml(t.name)}</text>
+      `).join('');
+
+      let seriesSVG = '';
+      if (ui.graphMode === 'total') {
+        const pts = scored.map((t, i) => `${getX(i)},${getY(t.total)}`).join(' ');
+        const dots = scored.map((t, i) => `
+          <circle cx="${getX(i)}" cy="${getY(t.total)}" r="5" fill="#c084fc" stroke="#090b10" stroke-width="2" />
+          <text x="${getX(i)}" y="${getY(t.total) - 10}" text-anchor="middle" fill="#e9d5ff" font-size="11" font-weight="600" font-family="JetBrains Mono">${t.total}</text>
+        `).join('');
+        seriesSVG = `
+          ${scored.length > 1 ? `<polyline fill="none" stroke="#c084fc" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" points="${pts}" />` : ''}
+          ${dots}
+        `;
+      } else {
+        const subs = [
+          { key: 'phy', color: '#38bdf8' },
+          { key: 'chem', color: '#34d399' },
+          { key: 'math', color: '#fbbf24' }
+        ];
+        seriesSVG = subs.map(s => {
+          const validPts = scored.map((t, i) => typeof t[s.key] === 'number' ? { x: getX(i), y: getY(t[s.key]) } : null).filter(Boolean);
+          if (validPts.length === 0) return '';
+          const poly = validPts.length > 1
+            ? `<polyline fill="none" stroke="${s.color}" stroke-width="2" points="${validPts.map(p => `${p.x},${p.y}`).join(' ')}" />`
+            : '';
+          const dots = validPts.map(p => `<circle cx="${p.x}" cy="${p.y}" r="3.5" fill="${s.color}" />`).join('');
+          return poly + dots;
+        }).join('');
+      }
+
+      chartEl.innerHTML = `
+        <svg viewBox="0 0 ${W} ${H}" class="w-full h-auto">
+          ${gridSVG}
+          ${xLabelsSVG}
+          ${seriesSVG}
+        </svg>
+        ${ui.graphMode === 'pcm' ? `
+          <div class="flex items-center justify-center gap-4 pt-2 text-[11px] font-mono">
+            <span class="text-sky-400">● Physics</span>
+            <span class="text-emerald-400">● Chemistry</span>
+            <span class="text-amber-400">● Mathematics</span>
+          </div>` : ''}
+      `;
+    }
+
+    // =========================================================================
+    // 8. SYLLABUS VIEW (DUAL-LAYER PROGRESS + HIGH-WEIGHTAGE HIGHLIGHTS)
+    // =========================================================================
+    function renderSyllabusView() {
+      const scopeChapters = ui.activeSubject === 'All'
+        ? state.chapters
+        : state.chapters.filter(c => c.subject === ui.activeSubject);
+      const scopeTotal = scopeChapters.length;
+      const scopeTheoryDone = scopeChapters.filter(c => c.theory === 'Completed').length;
+      const scopeExamReady = scopeChapters.filter(c => c.theory === 'Completed' && c.pyqs === 'Completed').length;
+      const safeDenom = scopeTotal || 1;
+
+      document.getElementById('syl-theory-count').textContent = `${scopeTheoryDone}/${scopeTotal}`;
+      document.getElementById('syl-ready-count').textContent = `${scopeExamReady}/${scopeTotal}`;
+      document.getElementById('syl-bar-theory').style.width = `${Math.round((scopeTheoryDone / safeDenom) * 100)}%`;
+      document.getElementById('syl-bar-ready').style.width = `${Math.round((scopeExamReady / safeDenom) * 100)}%`;
+
+      const theoryBarBtn = document.getElementById('syl-btn-theory');
+      const readyBarBtn = document.getElementById('syl-btn-ready');
+      if (theoryBarBtn) {
+        theoryBarBtn.className = ui.syllabusFilter === 'TheoryDone'
+          ? 'px-3 py-1.5 rounded-xl bg-indigo-500/20 border border-indigo-400/45 text-xs font-semibold text-indigo-100 transition inline-flex items-center gap-2'
+          : 'px-3 py-1.5 rounded-xl bat-elevated border text-xs font-medium text-slate-300 hover:text-white transition inline-flex items-center gap-2';
+      }
+      if (readyBarBtn) {
+        readyBarBtn.className = ui.syllabusFilter === 'ExamReady'
+          ? 'px-3 py-1.5 rounded-xl bg-emerald-500/20 border border-emerald-400/45 text-xs font-semibold text-emerald-100 transition inline-flex items-center gap-2'
+          : 'px-3 py-1.5 rounded-xl bat-elevated border text-xs font-medium text-slate-300 hover:text-white transition inline-flex items-center gap-2';
+      }
+
+      ['All', 'Physics', 'Chemistry', 'Mathematics'].forEach(sub => {
+        const btn = document.getElementById(`syl-tab-${sub}`);
+        if (!btn) return;
+        btn.className = ui.activeSubject === sub
+          ? 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/10 text-white transition'
+          : 'px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition';
+      });
+
+      ['All', 'HighWeightage', 'ReadyPYQ', 'OpenLoops', 'NotStarted', 'ExamReady'].forEach(chip => {
+        const btn = document.getElementById(`chip-${chip}`);
+        if (!btn) return;
+        if (ui.syllabusFilter === chip) {
+          btn.className = chip === 'HighWeightage'
+            ? 'px-2.5 py-1 rounded-lg text-xs font-semibold bg-red-500/25 text-red-100 border border-red-400/50 transition'
+            : 'px-2.5 py-1 rounded-lg text-xs font-semibold bg-white/15 text-white border border-white/15 transition';
+        } else {
+          btn.className = chip === 'HighWeightage'
+            ? 'px-2.5 py-1 rounded-lg text-xs font-medium bg-red-500/10 text-red-300 border border-red-500/20 hover:bg-red-500/20 transition'
+            : 'px-2.5 py-1 rounded-lg text-xs font-medium bat-elevated text-slate-400 hover:text-white transition';
+        }
+      });
+
+      const q = document.getElementById('syllabus-search').value.trim().toLowerCase();
+      const rows = scopeChapters.filter(ch => {
+        if (q && !ch.name.toLowerCase().includes(q)) return false;
+        if (ui.syllabusFilter === 'HighWeightage') return HIGH_WEIGHTAGE_SET.has(ch.name);
+        if (ui.syllabusFilter === 'TheoryDone') return ch.theory === 'Completed';
+        if (ui.syllabusFilter === 'ReadyPYQ') return ch.theory === 'Completed' && ch.pyqs !== 'Completed';
+        if (ui.syllabusFilter === 'OpenLoops') return ch.theory === 'Ongoing' || ch.pyqs === 'Ongoing';
+        if (ui.syllabusFilter === 'NotStarted') return ch.theory === 'Not Started' && ch.pyqs === 'Not Started';
+        if (ui.syllabusFilter === 'ExamReady') return ch.theory === 'Completed' && ch.pyqs === 'Completed';
+        return true;
+      });
+
+      const tbody = document.getElementById('syllabus-tbody');
+      if (rows.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" class="py-10 text-center text-xs text-slate-500">No chapters match this filter.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = rows.map(ch => {
+        const isHw = HIGH_WEIGHTAGE_SET.has(ch.name);
+        const subStyle = SUBJECT_STYLE[ch.subject] || SUBJECT_STYLE.Physics;
+        return `
+          <tr class="${isHw ? 'bg-red-500/[0.065] hover:bg-red-500/[0.11]' : 'hover:bg-white/[0.02]'} transition">
+            <td class="py-3 px-4 sm:px-5 font-medium text-white relative">
+              ${isHw ? `<span class="absolute left-0 top-1 bottom-1 w-1 rounded-r bg-red-500/80"></span>` : ''}
+              <div class="flex flex-wrap items-center gap-2">
+                <span>${escapeHtml(ch.name)}</span>
+                ${ui.activeSubject === 'All' ? `<span class="text-[10px] font-mono ${subStyle.text}">${ch.subject.slice(0, 4)}</span>` : ''}
+                ${isHw ? `<span class="px-1.5 py-0.2 rounded text-[10px] font-mono bg-red-500/15 text-red-300 border border-red-500/25">High Wt</span>` : ''}
+              </div>
+            </td>
+            <td class="py-3 px-3 whitespace-nowrap">
+              <button onclick="toggleStrategyMode('${ch.id}')" class="px-2 py-0.5 rounded-md font-mono text-[11px] bat-elevated border text-slate-400 hover:text-white transition">
+                ${ch.mode}
+              </button>
+            </td>
+            <td class="py-3 px-3 text-center whitespace-nowrap">
+              <button onclick="cycleChapterStatus('${ch.id}', 'theory')" class="px-2.5 py-1 rounded-lg text-[11px] font-medium border transition ${getStatusBadgeClass(ch.theory)}">
+                ${ch.theory}
+              </button>
+            </td>
+            <td class="py-3 px-4 sm:px-5 text-center whitespace-nowrap">
+              <button onclick="cycleChapterStatus('${ch.id}', 'pyqs')" class="px-2.5 py-1 rounded-lg text-[11px] font-medium border transition ${getStatusBadgeClass(ch.pyqs)}">
+                ${ch.pyqs}
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function cycleChapterStatus(id, field) {
+      const order = ['Not Started', 'Ongoing', 'Completed'];
+      const ch = state.chapters.find(c => c.id === id);
+      if (!ch) return;
+      const next = order[(order.indexOf(ch[field]) + 1) % order.length];
+      ch[field] = next;
+      if (next === 'Completed') {
+        if (field === 'theory' && ch.pyqs !== 'Completed' && !(state.recentTheoryDoneIds || []).includes(id)) {
+          state.recentTheoryDoneIds.unshift(id);
+        }
+        if (field === 'pyqs') {
+          state.recentTheoryDoneIds = (state.recentTheoryDoneIds || []).filter(x => x !== id);
+        }
+        logSessionSync(`${ch.name} (${field === 'theory' ? 'Theory' : 'PYQs'})`);
+      } else if (field === 'theory') {
+        state.recentTheoryDoneIds = (state.recentTheoryDoneIds || []).filter(x => x !== id);
+      }
+      saveState();
+      renderAll();
+    }
+
+    function toggleStrategyMode(id) {
+      const ch = state.chapters.find(c => c.id === id);
+      if (!ch) return;
+      ch.mode = ch.mode === 'Full Top 500' ? '90m Sitter' : 'Full Top 500';
+      saveState();
+      renderSyllabusView();
+    }
+
+    // =========================================================================
+    // 9. TWO-WAY SYNC: GEMINI 1-LINE, EXCEL/CSV IMPORT & EXPORT, OFFLINE HTML
+    // =========================================================================
+    function buildGeminiSyncString() {
+      const theoryDone = state.chapters.filter(c => c.theory === 'Completed').length;
+      const readyCount = state.chapters.filter(c => c.theory === 'Completed' && c.pyqs === 'Completed').length;
+      const doneLog = (state.sessionCompletedLog && state.sessionCompletedLog.length > 0)
+        ? state.sessionCompletedLog.join(', ')
+        : 'None yet';
+      const ongoing = state.chapters
+        .filter(c => c.theory === 'Ongoing' || c.pyqs === 'Ongoing')
+        .map(c => `${c.name} [${c.theory === 'Ongoing' ? 'T' : ''}${c.theory === 'Ongoing' && c.pyqs === 'Ongoing' ? '+' : ''}${c.pyqs === 'Ongoing' ? 'P' : ''}]`)
+        .slice(0, 8)
+        .join(', ') || 'None';
+      const latestTest = [...(state.testScores || [])].reverse().find(t => typeof t.total === 'number');
+      const mockStr = latestTest ? ` | Latest Mock: ${latestTest.name} (${latestTest.total}/300)` : '';
+
+      return `Tracker Sync: Completed [${doneLog}] | Ongoing [${ongoing}] | Theory: ${theoryDone}/81 | Exam Ready: ${readyCount}/81${mockStr}`;
+    }
+
+    function copyGeminiSyncLine() {
+      const text = buildGeminiSyncString();
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand('copy');
+        state.sessionSyncCount = 0;
+        saveState();
+        renderHeaderAndTheme();
+        showToast('Gemini Sync Line copied ✓');
+      } catch (e) {
+        showToast('Copy failed — please try again.');
+      }
+      document.body.removeChild(ta);
+    }
+
+    function normalizeStatus(raw) {
+      const s = String(raw || '').trim().toLowerCase();
+      if (s.includes('comp') || s === 'done' || s === 'yes') return 'Completed';
+      if (s.includes('ong') || s.includes('prog') || s === 'started') return 'Ongoing';
+      return 'Not Started';
+    }
+
+    function parseCSVLine(line) {
+      const result = [];
+      let cur = '';
+      let inQuotes = false;
+      for (let i = 0; i < line.length; i++) {
+        const ch = line[i];
+        if (ch === '"') {
+          if (inQuotes && line[i + 1] === '"') {
+            cur += '"';
+            i++;
+          } else {
+            inQuotes = !inQuotes;
+          }
+        } else if (ch === ',' && !inQuotes) {
+          result.push(cur.trim());
+          cur = '';
+        } else {
+          cur += ch;
+        }
+      }
+      result.push(cur.trim());
+      return result;
+    }
+
+    function triggerFileImport() {
+      document.getElementById('xlsx-file-input').click();
+    }
+
+    function handleFileImport(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        try {
+          let updated = 0;
+          const applyRow = (chapName, theoryVal, pyqVal) => {
+            if (!chapName) return;
+            const match = state.chapters.find(c => c.name.toLowerCase() === String(chapName).trim().toLowerCase());
+            if (match) {
+              if (theoryVal !== undefined) match.theory = normalizeStatus(theoryVal);
+              if (pyqVal !== undefined) match.pyqs = normalizeStatus(pyqVal);
+              updated++;
+            }
+          };
+
+          if (file.name.toLowerCase().endsWith('.csv') || typeof XLSX === 'undefined') {
+            const text = new TextDecoder().decode(new Uint8Array(e.target.result));
+            const lines = text.split(/\r?\n/).filter(Boolean);
+            if (lines.length > 1) {
+              const headers = parseCSVLine(lines[0]).map(h => h.toLowerCase());
+              const cIdx = headers.findIndex(h => h.includes('chapter'));
+              const tIdx = headers.findIndex(h => h.includes('theory'));
+              const pIdx = headers.findIndex(h => h.includes('pyq'));
+              for (let i = 1; i < lines.length; i++) {
+                const cols = parseCSVLine(lines[i]);
+                applyRow(cols[cIdx], tIdx >= 0 ? cols[tIdx] : undefined, pIdx >= 0 ? cols[pIdx] : undefined);
+              }
+            }
+          } else {
+            const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+            wb.SheetNames.forEach(sName => {
+              const rows = XLSX.utils.sheet_to_json(wb.Sheets[sName], { defval: '' });
+              rows.forEach(row => {
+                const keys = Object.keys(row);
+                const cKey = keys.find(k => k.toLowerCase().includes('chapter'));
+                const tKey = keys.find(k => k.toLowerCase().includes('theory'));
+                const pKey = keys.find(k => k.toLowerCase().includes('pyq'));
+                if (cKey) {
+                  applyRow(row[cKey], tKey ? row[tKey] : undefined, pKey ? row[pKey] : undefined);
+                }
+              });
+            });
+          }
+
+          saveState();
+          renderAll();
+          showToast(`Synced ${updated} chapters from ${file.name} ✓`);
+        } catch (err) {
+          console.error(err);
+          showToast('Import error — verify Chapters, Theory, and MUST DO PYQs columns.');
+        } finally {
+          event.target.value = '';
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    function exportExcelWorkbook() {
+      const todayIso = getStudyDateISO();
+      try {
+        if (typeof XLSX === 'undefined') {
+          const csvRows = ['"Subject","Chapters","Theory","MUST DO PYQs"'];
+          state.chapters.forEach(c => {
+            csvRows.push(`"${c.subject}","${c.name.replace(/"/g, '""')}","${c.theory}","${c.pyqs}"`);
+          });
+          const blob = new Blob([csvRows.join('\n')], { type: 'text/csv;charset=utf-8' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `SYLLABUS_COMPLETION_TRACKER_${todayIso}.csv`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+          showToast('Exported offline CSV tracker ✓');
+          return;
+        }
+
+        const wb = XLSX.utils.book_new();
+        ['Physics', 'Chemistry', 'Mathematics'].forEach(subject => {
+          const rows = state.chapters
+            .filter(c => c.subject === subject)
+            .map(c => ({
+              'Chapters': c.name,
+              'Theory': c.theory,
+              'MUST DO PYQs': c.pyqs
+            }));
+          const ws = XLSX.utils.json_to_sheet(rows);
+          ws['!cols'] = [{ wch: 42 }, { wch: 16 }, { wch: 16 }];
+          XLSX.utils.book_append_sheet(wb, ws, subject);
+        });
+        XLSX.writeFile(wb, `SYLLABUS_COMPLETION_TRACKER_${todayIso}.xlsx`);
+        showToast('Exported 3-sheet .xlsx workbook ✓');
+      } catch (err) {
+        console.error(err);
+        showToast('Export failed.');
+      }
+    }
+
+    function downloadOfflineHTML() {
+      try {
+        const clone = document.documentElement.cloneNode(true);
+        ['lock-overlay', 'score-modal', 'graph-modal', 'reset-modal', 'sync-dropdown'].forEach(id => {
+          const el = clone.querySelector(`#${id}`);
+          if (el) {
+            el.classList.add('hidden');
+            el.classList.remove('flex');
+          }
+        });
+        const toastEl = clone.querySelector('#toast-container');
+        if (toastEl) toastEl.innerHTML = '';
+
+        let html = clone.outerHTML;
+        const safeJson = JSON.stringify(state, null, 2).replace(/<\/script>/gi, '<\\/script>');
+        html = html.replace(
+          /const INITIAL_DATA = \{[\s\S]*?\n    \};/,
+          () => `const INITIAL_DATA = ${safeJson};`
+        );
+
+        const blob = new Blob(['<!DOCTYPE html>\n' + html], { type: 'text/html;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `JEE2027_${getStudyDateISO()}.html`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast('Downloaded self-contained Offline HTML ✓');
+      } catch (err) {
+        console.error(err);
+        showToast('Offline HTML download failed.');
+      }
+    }
+
+    // =========================================================================
+    // 10. NAVIGATION, HELPERS, & BOOTSTRAP
+    // =========================================================================
+    function switchView(view) {
+      ui.activeView = view;
+      ['today', 'roadmap', 'syllabus'].forEach(v => {
+        const sec = document.getElementById(`view-${v}`);
+        const nav = document.getElementById(`nav-${v}`);
+        if (!sec || !nav) return;
+        if (v === view) {
+          sec.classList.remove('hidden');
+          nav.className = 'px-3 py-1 rounded-lg text-xs font-semibold bg-white/10 text-white transition';
+        } else {
+          sec.classList.add('hidden');
+          nav.className = 'px-3 py-1 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition';
+        }
+      });
+
+      if (view === 'today') renderTodayView();
+      if (view === 'roadmap') renderRoadmapView();
+      if (view === 'syllabus') renderSyllabusView();
+    }
+
+    function setSubjectTab(sub) {
+      ui.activeSubject = sub;
+      renderSyllabusView();
+    }
+
+    function setSyllabusFilter(filter) {
+      ui.syllabusFilter = filter;
+      renderSyllabusView();
+    }
+
+    function toggleSyllabusBarFilter(filter) {
+      ui.syllabusFilter = ui.syllabusFilter === filter ? 'All' : filter;
+      renderSyllabusView();
+    }
+
+    function toggleSyncMenu(e) {
+      e.stopPropagation();
+      document.getElementById('sync-dropdown').classList.toggle('hidden');
+    }
+
+    function closeSyncMenu() {
+      document.getElementById('sync-dropdown').classList.add('hidden');
+    }
+
+    function getStatusBadgeClass(status) {
+      if (status === 'Completed') return 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30 hover:bg-emerald-500/25';
+      if (status === 'Ongoing') return 'bg-amber-500/15 text-amber-300 border-amber-500/30 hover:bg-amber-500/25';
+      return 'bat-elevated text-slate-400 hover:text-white';
+    }
+
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function openResetModal() {
+      const m = document.getElementById('reset-modal');
+      m.classList.remove('hidden');
+      m.classList.add('flex');
+    }
+
+    function closeResetModal() {
+      const m = document.getElementById('reset-modal');
+      m.classList.add('hidden');
+      m.classList.remove('flex');
+    }
+
+    function confirmReset() {
+      localStorage.removeItem(STORAGE_KEY);
+      state = JSON.parse(JSON.stringify(INITIAL_DATA));
+      state.lastStudyDate = getStudyDateISO();
+      saveState();
+      closeResetModal();
+      renderAll();
+      showToast('Restored Nov 22 baseline snapshot ✓');
+    }
+
+    function showToast(msg) {
+      const container = document.getElementById('toast-container');
+      const el = document.createElement('div');
+      el.className = 'px-4 py-2.5 rounded-xl bg-[#0e1118] border border-white/15 text-slate-100 text-xs font-medium shadow-2xl transition-opacity duration-300';
+      el.textContent = msg;
+      container.appendChild(el);
+      setTimeout(() => {
+        el.style.opacity = '0';
+        setTimeout(() => el.remove(), 300);
+      }, 2600);
+    }
+
+    function renderAll() {
+      renderHeaderAndTheme();
+      if (ui.activeView === 'today') renderTodayView();
+      if (ui.activeView === 'roadmap') renderRoadmapView();
+      if (ui.activeView === 'syllabus') renderSyllabusView();
+    }
+
+    document.addEventListener('click', () => closeSyncMenu());
+    window.addEventListener('blur', () => cancelExitHold());
+    window.addEventListener('resize', () => {
+      if (ui.activeView === 'roadmap') {
+        updateRoadPopupPreview(ui.selectedRoadIdx);
+      }
+    });
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadState();
+      renderAll();
+      // Live 5:00 AM IST background rollover check every 60 seconds
+      setInterval(() => handleStudyDayRollover(true), 60000);
+    });
+  </script>
+</body>
+</html>
