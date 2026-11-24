@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>JEE 2027 · Batcave</title>
+<meta name="theme-color" content="#050608">
+<meta name="apple-mobile-web-app-title" content="Batcave">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23050608'/%3E%3Crect x='1.5' y='1.5' width='61' height='61' rx='13' fill='none' stroke='%2338bdf8' stroke-opacity='.45' stroke-width='3'/%3E%3Cpath transform='translate(5.1 17.7) scale(.84)' fill='%2338bdf8' d='M32 3C30 8 28 10 25 10 18 10 11 7 2 1c3 9 6 17 15 19 5 1 9 4 12 12l3-6 3 6c3-8 7-11 12-12 9-2 12-10 15-19-9 6-16 9-23 9-3 0-5-2-7-7z'/%3E%3C/svg%3E">
+<style>
+*{-webkit-tap-highlight-color:transparent}button,.pill,.btn,label{touch-action:manipulation}
+#fo{position:fixed;inset:0;z-index:50;background:#030407f5;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:20px;text-align:center;overflow-y:auto}
+#fo.on{display:flex}.ring{width:210px;height:210px;border-radius:50%;border:2px solid #38bdf855;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 0 60px -10px var(--a),inset 0 0 40px -14px var(--a);animation:br 5s ease-in-out infinite}
+@keyframes br{50%{transform:scale(1.05)}}
+#hold{position:relative;overflow:hidden;width:min(340px,90vw);border:1px solid #334155;background:#090c12;color:var(--m);padding:11px;border-radius:12px;touch-action:none;user-select:none;font:12px monospace}
+#hold i{position:absolute;inset:0 auto 0 0;width:0;background:#e11d4866}#hold span{position:relative}
+:root{color-scheme:dark;--bg:#050608;--s:#0b0e14;--e:#111622;--b:#1e2638;--a:#38bdf8;--t:#e2e8f0;--m:#94a3b8;--g:#34d399;--r:#f43f5e;--am:#fbbf24;--pu:#c084fc;--in:#818cf8}
+body.hwm{--a:#f43f5e}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg) radial-gradient(circle at 18% 0,rgba(56,189,248,.07),transparent 42%);color:var(--t);font:14px/1.4 Inter,-apple-system,"Segoe UI",sans-serif;min-height:100vh}
+body.hwm{background:var(--bg) radial-gradient(circle at 18% 0,rgba(244,63,94,.1),transparent 45%)}
+main{max-width:1000px;margin:0 auto;padding:12px 14px calc(60px + env(safe-area-inset-bottom,0px))}
+header{position:sticky;top:0;z-index:20;background:rgba(5,6,8,.92);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid var(--b);padding-top:env(safe-area-inset-top,0px)}
+.hin{max-width:1000px;margin:auto;padding:8px 14px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+h1{font-size:16px;margin:0}h2{font-size:14px;margin:18px 0 8px;display:flex;gap:8px;align-items:center;justify-content:space-between}h3{font-size:15px;margin:8px 0 2px}
+small,.mono{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11px;color:var(--m)}
+.tabs{display:flex;background:var(--s);border:1px solid var(--b);border-radius:12px;padding:3px}
+.tabs button{border:0;background:none;color:var(--m);padding:6px 12px;border-radius:9px;font-weight:600;font-size:12px}
+.tabs button.on,.btn,.pill.on{background:var(--a);color:#050608}
+.btn{border:0;border-radius:10px;padding:9px 12px;font-weight:700;font-size:12px;width:100%;margin-top:8px;cursor:pointer;color:#050608;background:var(--a)}
+.btn.g{background:var(--g)}.btn.i{background:var(--in);color:#fff}.btn.o{background:var(--s);color:var(--t);border:1px solid var(--b);width:auto;margin:0;display:inline-block}
+.card{position:relative;background:linear-gradient(180deg,#111622,#0b0e14);border:1px solid var(--b);border-radius:14px;padding:12px;box-shadow:0 10px 30px -14px #000}
+.card.hw{border-color:rgba(244,63,94,.45)}
+.grid{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.row{display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap}
+.chip{font:600 10px "JetBrains Mono",monospace;padding:2px 7px;border-radius:6px;border:1px solid}
+.chip.P{color:#7dd3fc;border-color:#0ea5e955}.chip.C{color:#6ee7b7;border-color:#10b98155}.chip.M{color:#fcd34d;border-color:#f59e0b55}
+b.ov,b.hwt{font:700 10px monospace;color:#fda4af;border:1px solid #f43f5e66;background:#f43f5e22;border-radius:5px;padding:1px 5px;margin-left:4px}
+.dn{text-decoration:line-through;color:#64748b}
+.ok{margin-top:8px;text-align:center;font:600 12px monospace;color:var(--g);background:#10b9811f;border-radius:10px;padding:8px}
+.und{background:none;border:1px solid #334155;color:var(--m);border-radius:7px;padding:2px 8px;margin-left:8px;font:600 11px monospace;cursor:pointer}
+.ban{border-radius:12px;padding:10px 12px;margin-top:10px;font-size:12px}.amb{background:#78350f40;border:1px solid #f59e0b70;color:#fcd34d}.red{background:#4c051940;border:1px solid #f43f5e70;color:#fda4af}.pur{background:#3b076440;border:1px solid #a855f770;color:#e9d5ff}
+.bar{height:8px;border-radius:9px;background:#050608;border:1px solid var(--b);overflow:hidden}.bar i{display:block;height:100%;background:var(--a);transition:width .4s}
+.pill{border:1px solid var(--b);background:var(--s);color:var(--m);border-radius:9px;padding:5px 10px;font:600 11px "JetBrains Mono",monospace;cursor:pointer}
+.pill.O{background:#f59e0b2a;color:#fcd34d;border-color:#f59e0b66}.pill.C2{background:#10b9812a;color:#6ee7b7;border-color:#10b98166}.pill.rv{background:#6366f12a;color:#a5b4fc;border-color:#6366f166}.pill.on{color:#050608}
+table{width:100%;border-collapse:collapse}td,th{padding:9px 6px;border-bottom:1px solid #1e263888;text-align:center}td:first-child,th:first-child{text-align:left}th{font:600 10px monospace;color:var(--m);text-transform:uppercase}
+input,select,textarea{background:#050608;border:1px solid var(--b);color:var(--t);border-radius:9px;padding:7px 9px;font:inherit;font-size:16px}
+input[type=range]{width:100%;accent-color:var(--a);padding:0}
+.hide{display:none!important}
+.day{margin-top:8px;border-left:3px solid var(--b)}.day.sel{border-color:var(--a)}.day.pastd{border-left-color:var(--g)}.day.q{border-left-color:var(--pu)}.day.buf{border-left-color:var(--am)}
+.day p{margin:3px 0;font-size:12px}.T{color:#7dd3fc}.Pp{color:#6ee7b7}.R{color:#a5b4fc}
+#toast{position:fixed;bottom:calc(16px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);max-width:92vw;text-align:center;background:#0d111a;border:1px solid #334155;padding:9px 14px;border-radius:12px;font:12px monospace;opacity:0;transition:.3s;z-index:60;pointer-events:none}
+details{margin-top:12px}summary{cursor:pointer;color:var(--m);font:600 12px monospace}
+main{position:relative;z-index:2}
+body::after{content:"";position:fixed;left:0;right:0;bottom:0;height:100px;z-index:1;pointer-events:none;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 420 100'%3E%3Cpath fill='%2309101c' d='M0 100V62h30V40h20v30h25V25h18v45h30V45h22v35h30V30h16v50h28V52h24v40h30V58h20v22h34V40h18v40h26V62h49V100z'/%3E%3C/svg%3E") repeat-x bottom/420px 100px}
+#sig{position:fixed;right:5%;bottom:80px;width:200px;height:62vh;z-index:0;pointer-events:none;background:linear-gradient(to top,rgba(56,189,248,.17),transparent 85%);clip-path:polygon(42% 100%,58% 100%,100% 0,0 0);transform-origin:50% 100%;animation:sw 9s ease-in-out infinite}
+body.hwm #sig{background:linear-gradient(to top,rgba(244,63,94,.2),transparent 85%)}
+@keyframes sw{50%{transform:rotate(7deg)}}
+.card::before{content:"";position:absolute;left:14px;right:14px;top:0;height:1px;background:linear-gradient(90deg,transparent,var(--a),transparent);opacity:.55}
+#cards{position:relative;padding-left:24px}#cards::before{content:"";position:absolute;left:4px;top:4px;bottom:4px;width:11px;border-radius:6px;background:#0e1422;border:1px solid #334155}#cards::after{content:"";position:absolute;left:9px;top:8px;bottom:8px;width:2px;background:repeating-linear-gradient(to bottom,#e2e8f0aa 0 8px,transparent 8px 16px)}
+@keyframes pu{0%{transform:scale(.8);opacity:.9}100%{transform:scale(2.3);opacity:0}}.bc{transform-box:fill-box;transform-origin:center;animation:pu 2.2s infinite}
+.proj{font-size:13px;margin-top:4px}.proj b.okc{color:var(--g)}.proj b.bad{color:#fda4af}
+.dlc{position:relative;display:inline-flex;gap:6px;align-items:center;margin-top:6px;padding:4px 8px;border:1px dashed #334155;border-radius:8px;font:11px monospace;color:var(--m);cursor:pointer}.dlc u{color:var(--t);text-decoration:none;font-weight:700}.dlc input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;padding:0}
+.kv{font:700 19px "JetBrains Mono",monospace;margin-top:2px}
+hr{border:0;border-top:1px solid var(--b);margin:14px 0 10px}
+</style></head><body>
+<div id="toast"></div><div id="sig"></div>
+<div id="nx" class="hide" style="position:fixed;inset:0;z-index:55;background:#000a;align-items:center;justify-content:center;padding:20px;display:flex"><div class="card" style="max-width:340px;text-align:center"><small style="color:var(--g)">THEORY CLOSED ✓</small><h3 id="nxt"></h3><small>Its MUST DO PYQ set is now a target for today. Lock in while it’s fresh.</small><button class="btn g" onclick="nxGo()">Start PYQs now</button><button class="btn o" style="width:100%;margin-top:8px" onclick="nxHide()">Later today</button></div></div>
+<div id="fo"><small id="fb"></small><h2 id="ft" style="font-size:24px;justify-content:center"></h2><small id="fs"></small>
+<div class="ring"><small>LOCKED IN</small><div id="fi" style="font:700 20px 'JetBrains Mono',monospace;margin-top:6px"></div></div>
+<small id="fh"></small>
+<button class="btn" style="max-width:340px" onclick="finishF()">Target completed — mark done</button>
+<div id="hold"><i id="hp"></i><span id="hl">Hold 7s to exit lock</span></div></div>
+<script id="seed" type="application/json">null</script>
+
+<header><div class="hin">
+<div><h1><svg viewBox="0 0 64 34" width="34" height="18" style="vertical-align:-2px;fill:var(--a);filter:drop-shadow(0 0 6px var(--a))"><path d="M32 3C30 8 28 10 25 10 18 10 11 7 2 1c3 9 6 17 15 19 5 1 9 4 12 12l3-6 3 6c3-8 7-11 12-12 9-2 12-10 15-19-9 6-16 9-23 9-3 0-5-2-7-7z"/></svg> JEE 2027 <span class="chip P" id="hbuf">Auto-plan</span></h1><small id="hdate"></small></div>
+<div class="tabs"><button id="n-today" onclick="go('today')">Today</button><button id="n-road" onclick="go('road')">Roadmap</button><button id="n-syl" onclick="go('syl')">Syllabus</button></div>
+<button class="pill" id="hwb" onclick="togHW()"></button></div></header>
+
+<main>
+<section id="v-today">
+<div id="banners"></div>
+<div class="card" style="margin-top:10px"><div class="row"><span class="chip P" id="dpill"></span><small id="stat"></small></div>
+<small id="subj" style="display:block;margin-top:6px"></small>
+<div class="row" style="margin-top:10px"><small>Today’s mission</small><small id="ptxt"></small></div><div class="bar"><i id="pbar" style="width:0"></i></div>
+<button class="btn i" onclick="copySync()">Copy Gemini sync line</button>
+<textarea id="sl" class="hide" readonly style="width:100%;height:90px;margin-top:8px"></textarea></div>
+<div id="kp" class="grid" style="margin-top:10px;grid-template-columns:repeat(auto-fit,minmax(130px,1fr))"></div>
+<h2>Subject deadlines <small>auto-tracked</small></h2><div class="grid" id="dl"></div>
+<div id="qft"></div>
+<h2><span>01 · Theory focus</span><button class="pill" onclick="pull('T')">+ Next chapter</button></h2><div class="grid" id="gT"></div>
+<h2><span>02 · MUST DO PYQs</span><button class="pill" onclick="pull('P')">+ Next PYQ set</button></h2><div class="grid" id="gP"></div>
+<h2><span>03 · Revision sweep</span><button class="pill" onclick="pull('R')">+ More revision</button></h2><div class="grid" id="gR"></div>
+
+<details><summary>⚙ Settings · Sync · Backup</summary><div class="card" style="margin-top:8px">
+<div class="row"><label>Study hours / day <input id="hrs" type="number" inputmode="decimal" min="3" max="12" step=".5" style="width:80px" onchange="setHrs(this.value)"></label></div>
+<div class="row" style="margin-top:8px"><small>Study day ends at (hour, 24 = midnight)</small><input id="dend" type="number" inputmode="decimal" min="18" max="24" step=".5" style="width:80px" onchange="setDayEnd(this.value)"></div>
+<small style="display:block;margin-top:4px">When theory closes with 5 h or more left before this time, that chapter’s PYQ set is added to today and a start popup appears. Otherwise it is queued for tomorrow.</small>
+<div id="dls" style="margin-top:8px;display:grid;gap:6px"></div>
+<div class="row" style="margin-top:10px;justify-content:flex-start"><button class="btn o" onclick="replan()">Replan today</button><button class="btn o" id="rs" onclick="resetAll()">Reset baseline</button></div>
+<small style="display:block;margin-top:8px">Deadlines, hours and High-Weightage mode re-plan everything instantly. Completed items stay on today’s list.</small>
+<hr>
+<div class="row"><b>Sync across devices</b><small id="lx"></small></div>
+<small style="display:block;margin:4px 0 8px">This page can’t sync by itself. Export on one device, Import the file on the other. <b>HTML</b> and <b>.json</b> carry everything (progress, deadlines, hours, history, QFT scores). <b>Excel</b> carries chapter statuses only.</small>
+<div class="row" style="justify-content:flex-start"><button class="btn o" onclick="expHTML()">Export HTML</button><button class="btn o" onclick="expCSV()">Export Excel (.csv)</button><button class="btn o" onclick="expJSON()">Export .json</button></div>
+<div class="row" style="justify-content:flex-start;margin-top:8px"><label class="btn o" style="cursor:pointer">Import file (.html / .csv / .json)<input type="file" id="imp" class="hide" onchange="impFile(this)"></label><button class="btn o hide" id="uib" onclick="undoImport()">Undo last import</button></div>
+<textarea id="bk" placeholder="Text backup: tap Copy as text, send it to yourself, paste here on the other device and tap Restore from text." style="width:100%;margin-top:10px;height:56px"></textarea>
+<div class="row" style="justify-content:flex-start;margin-top:8px"><button class="btn o" onclick="bkCopy()">Copy as text</button><button class="btn o" onclick="bkRestore()">Restore from text</button></div>
+</div></details>
+</section>
+
+<section id="v-road" class="hide">
+<div class="grid" id="dl2" style="margin-bottom:10px"></div>
+<div class="card"><div class="row"><h3 style="margin:0">Syllabus highway</h3><small>drag the beacon · ⚑ = subject deadlines</small></div><svg id="hw" viewBox="0 0 1000 250" style="width:100%;height:auto;touch-action:pan-y;cursor:grab;overflow:visible;margin-top:6px"></svg><div id="pv" style="margin-top:6px"></div></div>
+<div class="card" id="qs" style="margin:10px 0"></div><div id="cards"></div></section>
+
+<section id="v-syl" class="hide"><div class="grid" id="dl3" style="margin-bottom:10px"></div>
+<div class="card"><div class="row"><small id="mst"></small></div>
+<div class="bar" style="margin-top:8px;display:flex"><i id="b1" style="background:var(--g)"></i><i id="b2" style="background:#38bdf8aa"></i></div></div>
+<div class="card" style="margin-top:10px"><div class="row" id="stabs"></div><div class="row" style="margin-top:8px"><input id="q" placeholder="Search chapter…" oninput="renderSyl()" style="flex:1"></div><div class="row" id="chips" style="margin-top:8px;justify-content:flex-start"></div></div>
+<div class="card" style="margin-top:10px;padding:4px;overflow-x:auto"><table><thead><tr><th>Chapter</th><th>Theory</th><th>PYQs</th><th>Revision</th></tr></thead><tbody id="tb"></tbody></table></div></section>
+</main>
+
+<script>
+// Pristine copy of this page (used by "Export HTML"); must stay the first statement.
+const SRC='<!DOCTYPE html>\n'+document.documentElement.outerHTML;
+
+// ---------- data ----------
+const KEY='jee27_batcave_v7',START='2026-11-24',FINAL='2026-12-15',BUFEND='2026-12-20';
+let SEED=null;
+try{const e=document.getElementById('seed'),t=e?e.textContent.trim():'';if(t&&t!=='null')SEED=JSON.parse(t)}catch(e){}
+const RAW={P:'Units and Dimensions|NN;Motion In One Dimension|NN;Motion In Two Dimensions|NN;Laws of Motion|CO;Work Power Energy|CO;COM, Momentum & Collision|CO;Rotational Motion|CC;Atomic Physics|NN;Dual Nature of Matter|NN;Nuclear Physics|NN;Kinetic Theory of Gases|NN;Thermal Properties of Matter|NN;Thermodynamics (Physics)|NN;Mechanical Properties of Fluids|NN;Mechanical Properties of Solids|NN;Oscillation|CO;Electrostatics|CC;Gravitation|NN;Capacitance|CC;Current Electricity|CC;Magnetic Effects of Current|CC;Magnetic Properties of Matter|CC;Alternating Current|CC;Electromagnetic Induction|CC;Wave Optics|NN;Ray Optics|NN;Waves and Sound|NN;Semiconductors & EM Waves|NN',
+C:'Mole Concept|CO;Structure of Atom|CC;Solutions|CC;Electrochemistry|CC;Chemical Kinetics|CC;Chemical Equilibrium|CC;Ionic Equilibrium|CC;Redox Reactions|CC;Thermodynamics (Chem)|CC;Periodic Table & Properties|CC;Chemical Bonding|CC;General Organic Chemistry|ON;Isomerism|NN;Hydrocarbon|NN;Haloalkanes and Haloarenes|NN;Alcohols, Phenols and Ethers|NN;Aldehydes, Ketones|NN;Carboxylic Acid Derivatives|NN;Amines|NN;Biomolecules|NN;Coordination Compounds|ON;d and f Block Elements|NN;p Block Elements|NN;Practical Chemistry [Qualitative Analysis]|NN',
+M:'Basic of Mathematics|CN;Quadratic Equation|NN;Sequences and Series|NN;Trigonometric Functions|CN;Trigonometric Equation|CN;Permutations and Combinations|NN;Binomial theorem|NN;Straight Lines|CO;Circle|CO;Parabola|CO;Ellipse|CN;Hyperbola|NN;Matrices|NN;Determinants|NN;Sets and Relations|CN;Functions|NN;Inverse Trigonometry|NN;Limits|CN;Continuity and Differentiability|CN;Application of Derivatives|CN;Indefinite Integration|CN;Definite Integration|CN;Area Under Curves|CN;Differential Equations|CN;Vector Algebra|NN;Three-Dimensional Geometry|NN;Complex Number|NN;Probability|NN;Statistics|NN'};
+const REV0=new Set(['Rotational Motion','Electrostatics','Capacitance','Current Electricity','Magnetic Effects of Current','Magnetic Properties of Matter','Electromagnetic Induction','Periodic Table & Properties','Chemical Bonding']);
+const INO=new Set(['Periodic Table & Properties','Chemical Bonding','Coordination Compounds','d and f Block Elements','p Block Elements','Practical Chemistry [Qualitative Analysis]']);
+const PHC=new Set(['Mole Concept','Structure of Atom','Solutions','Electrochemistry','Chemical Kinetics','Chemical Equilibrium','Ionic Equilibrium','Redox Reactions','Thermodynamics (Chem)']);
+const HW=new Set(['Current Electricity','Electrostatics','Magnetic Effects of Current','Ray Optics','Wave Optics','Atomic Physics','Dual Nature of Matter','Nuclear Physics','Semiconductors & EM Waves','Thermodynamics (Physics)','Kinetic Theory of Gases','Rotational Motion','Gravitation','Work Power Energy','Laws of Motion','General Organic Chemistry','Aldehydes, Ketones','Coordination Compounds','Chemical Bonding','Electrochemistry','Chemical Kinetics','Thermodynamics (Chem)','Solutions','Structure of Atom','d and f Block Elements','p Block Elements','Hydrocarbon','Haloalkanes and Haloarenes','Alcohols, Phenols and Ethers','Amines','Biomolecules','Three-Dimensional Geometry','Vector Algebra','Matrices','Determinants','Definite Integration','Differential Equations','Functions','Limits','Continuity and Differentiability','Application of Derivatives','Sequences and Series','Binomial theorem','Probability','Circle','Straight Lines']);
+const GN={phy:'Physics',ino:'Inorganic',phc:'Physical Chem',org:'Organic',mat:'Maths'},SN={P:'Physics',C:'Chemistry',M:'Maths'},ST={N:'Not Started',O:'Ongoing',C:'Completed'};
+const DL0={phy:'2026-12-07',ino:'2026-11-28',phc:'2026-11-26',org:'2026-12-15',mat:'2026-12-15'};
+const COST={T:90,P:75,R:40};
+const QB={'2026-11-28':['p',1],'2026-11-29':['t',1],'2026-12-05':['p',2],'2026-12-06':['t',2],'2026-12-12':['p',3],'2026-12-13':['t',3]},QX={'2026-12-16':['p',4],'2026-12-17':['t',4]};
+const C=[],byId={};
+Object.keys(RAW).forEach(s=>RAW[s].split(';').forEach((e,i)=>{const[n,tp]=e.split('|');const x={id:s+(i+1),s,n,t:tp[0],p:tp[1],r:REV0.has(n),cd:null,g:s=='P'?'phy':s=='M'?'mat':INO.has(n)?'ino':PHC.has(n)?'phc':'org'};C.push(x);byId[x.id]=x}));
+const BASE={};C.forEach(x=>{BASE[x.id]=[x.t,x.p,x.r,x.cd]});
+
+// ---------- helpers ----------
+const $=id=>document.getElementById(id),pad=n=>String(n).padStart(2,'0');
+const add=(s,n)=>{const[y,m,d]=s.split('-').map(Number);return new Date(Date.UTC(y,m-1,d+n)).toISOString().slice(0,10)};
+const dif=(a,b)=>Math.round((Date.parse(b)-Date.parse(a))/864e5);
+const fmt=s=>new Date(s+'T00:00:00Z').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',timeZone:'UTC'});
+const md=s=>fmt(s).replace(/^\w+, /,'');
+// Study day rolls over at 5 AM local time, so late-night sessions count for the day you started.
+const today=()=>{const n=new Date(Date.now()-5*36e5);const s=n.getFullYear()+'-'+pad(n.getMonth()+1)+'-'+pad(n.getDate());return s<START?START:s};
+const cmpA=(a,b)=>{for(let i=0;i<a.length;i++){if(a[i]<b[i])return-1;if(a[i]>b[i])return 1}return 0};
+const ev=(d,buf)=>QB[d]||(buf&&QX[d])||null,wt=(d,buf)=>{const e=ev(d,buf);return e?(e[0]=='p'?.25:.35):1};
+const endD=()=>S.buf?BUFEND:FINAL;
+function toast(m){const t=$('toast');t.textContent=m;t.style.opacity=1;clearTimeout(toast.h);toast.h=setTimeout(()=>t.style.opacity=0,2600)}
+const isDate=s=>typeof s=='string'&&/^\d{4}-\d\d-\d\d$/.test(s);
+const okKey=k=>typeof k=='string'&&(/^Q:\d{4}-\d\d-\d\d$/.test(k)||(/^[TPR]:[PCM]\d+$/.test(k)&&!!byId[k.slice(2)]));
+const cl=a=>Array.isArray(a)?[...new Set(a.filter(okKey))]:[];
+
+// ---------- state ----------
+const fresh=()=>({dl:{...DL0},hrs:8,dayEnd:24,hw:0,today:{date:null,keys:[]},hist:{},log:{},overdue:[],sel:null,buf:0,qft:{},sc:{},ts:0,lastExport:'',plan:{out:{},fin:{},left:new Set()}});
+let S=fresh();
+let UI={view:'today',sub:'P',filt:'All'};
+function adopt(r){
+  const f=fresh();
+  if(r.dl&&typeof r.dl=='object')Object.keys(DL0).forEach(g=>{if(isDate(r.dl[g]))f.dl[g]=r.dl[g]});
+  f.hrs=Math.max(3,Math.min(12,+r.hrs||8));f.hw=r.hw?1:0;f.dayEnd=Math.max(18,Math.min(24,+r.dayEnd||24));
+  const t=r.today||{};f.today={date:isDate(t.date)?t.date:null,keys:cl(t.keys)};
+  ['hist','log'].forEach(n=>{if(r[n]&&typeof r[n]=='object')Object.keys(r[n]).forEach(d=>{if(isDate(d))f[n][d]=cl(r[n][d])})});
+  f.overdue=cl(r.overdue);
+  f.qft=r.qft&&typeof r.qft=='object'?r.qft:{};f.sc=r.sc&&typeof r.sc=='object'?r.sc:{};
+  f.ts=+r.ts||0;f.lastExport=isDate(r.lastExport)?r.lastExport:'';
+  S=f;
+  C.forEach(x=>{const v=Array.isArray(r.ch&&r.ch[x.id])?r.ch[x.id]:BASE[x.id];x.t='NOC'.includes(v[0])?v[0]:'N';x.p='NOC'.includes(v[1])?v[1]:'N';x.r=!!v[2];x.cd=isDate(v[3])?v[3]:null});
+}
+function snap(){const o={...S};delete o.plan;o.ch=Object.fromEntries(C.map(x=>[x.id,[x.t,x.p,x.r,x.cd]]));return o}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(snap()))}catch(e){}}
+function touch(){S.ts=Date.now()}
+function load(){
+  let loc=null;
+  try{loc=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){}
+  if(!loc||!loc.ch)loc=null;
+  const has=!!(SEED&&SEED.ch),st=has?(+SEED.ts||0):-1,lt=loc?(+loc.ts||0):-1;
+  let msg='';
+  if(has&&(!loc||st>lt)){adopt(SEED);msg=loc?'Loaded newer progress from this file':'Loaded progress from this file'}
+  else{
+    if(loc)adopt(loc);
+    if(has&&st<lt){let seen='';try{seen=localStorage.getItem(KEY+'_seen')}catch(e){}
+      if(seen!==String(st)){msg='This file is older than the data on this device, so the device data was kept. Use Import to force it.';try{localStorage.setItem(KEY+'_seen',String(st))}catch(e){}}}
+  }
+  if(msg)setTimeout(()=>toast(msg),500);
+}
+function isDone(k){const ty=k[0],v=k.slice(2),x=byId[v];if(ty=='Q')return !!S.qft[v];if(!x)return true;return ty=='T'?x.t=='C':ty=='P'?x.p=='C':x.r}
+function logD(k){const td=today();const l=S.log[td]=S.log[td]||[];if(!l.includes(k))l.push(k)}
+
+// ---------- planner (simulation) ----------
+function sim(start,end,assume,buf){
+  const T0=today(),st={};C.forEach(x=>st[x.id]={t:x.t,p:x.p,r:x.r,td:x.cd===T0&&x.t=='C'?T0:null});
+  assume.forEach(k=>{const[ty,id]=k.split(':'),s=st[id];if(!s)return;if(ty=='T'){s.t='C';s.td=T0}if(ty=='P')s.p='C';if(ty=='R')s.r=true});
+  const ov=new Set(S.overdue),out={},fin={},cov={P:0,C:0,M:0};
+  for(let d=start;d<=end;d=add(d,1)){
+    const cap=S.hrs*60*wt(d,buf);let used=0;const day=out[d]=[];
+    const urg=new Set();
+    if(S.hw)Object.keys(S.dl).forEach(g=>{const D=S.dl[g];if(D<d){urg.add(g);return}let cm=0;for(let e=d;e<=D;e=add(e,1))cm+=S.hrs*60*wt(e,buf)*.75;let nd=0;C.forEach(x=>{if(S.dl[x.g]<=D){const s=st[x.id];nd+=(s.t!='C'?90:0)+(s.p!='C'?75:0)}});if(nd>=cm*.9)urg.add(g)});
+    const pn=s=>C.some(x=>x.s==s&&(st[x.id].t!='C'||st[x.id].p!='C'));
+    let subs=['P','C','M'].filter(pn);
+    if(subs.length>2){const must=subs.filter(s=>C.some(x=>x.s==s&&S.dl[x.g]<=add(d,2)&&(st[x.id].t!='C'||st[x.id].p!='C')));const rest=subs.filter(s=>!must.includes(s)).sort((a,b)=>cov[a]-cov[b]);subs=[...must,...rest].slice(0,2)}
+    subs.forEach(s=>cov[s]++);
+    if(ev(d,buf))day.push('Q:'+d);
+    const main=(lim,sf)=>{
+      const L=[];
+      C.forEach(x=>{if(sf&&!sf.includes(x.s))return;const s=st[x.id];if(s.t!='C')L.push(['T',x]);else if(s.p!='C'&&(s.td==null||s.td<d))L.push(['P',x])});
+      const key=([ty,x])=>[ov.has(ty+':'+x.id)?0:1,ty=='P'&&(st[x.id].td||x.cd)&&dif(st[x.id].td||x.cd,d)<=2?0:1,S.hw&&urg.has(x.g)?0:1,S.hw&&HW.has(x.n)?0:1,S.dl[x.g],ty=='T'?0:1,(st[x.id].t=='O'||st[x.id].p=='O')?0:1,C.indexOf(x)];
+      L.sort((a,b)=>cmpA(key(a),key(b)));
+      for(const[ty,x]of L){if(used+COST[ty]>lim)continue;used+=COST[ty];day.push(ty+':'+x.id);const s=st[x.id];if(ty=='T'){s.t='C';s.td=d}else s.p='C';fin[x.g]=d}
+    };
+    const rev=lim=>{
+      const L=C.filter(x=>{const s=st[x.id];if(s.t!='C'||s.r)return false;const b=s.td?add(s.td,3):x.cd?add(x.cd,3):'';return b<=d});
+      L.sort((a,b)=>cmpA([ov.has('R:'+a.id)?0:1,subs.includes(a.s)?0:1,S.hw&&HW.has(a.n)?0:1,a.cd||'',C.indexOf(a)],[ov.has('R:'+b.id)?0:1,subs.includes(b.s)?0:1,S.hw&&HW.has(b.n)?0:1,b.cd||'',C.indexOf(b)]));
+      for(const x of L){if(used+COST.R>lim)continue;used+=COST.R;day.push('R:'+x.id);st[x.id].r=true}
+    };
+    const sh=cap*.75/Math.max(1,subs.length);subs.forEach(s=>main(used+sh,[s]));rev(cap);main(cap,subs);main(cap);
+  }
+  const lm=C.filter(x=>st[x.id].t!='C'||st[x.id].p!='C');
+  const lr=C.filter(x=>st[x.id].t=='C'&&!st[x.id].r).length;
+  return{out,fin,lm:lm.length,lr,left:new Set(lm.map(x=>x.g))};
+}
+function calcBuf(td){
+  const has=S.today.date===td,r=sim(has?add(td,1):td,FINAL,has?S.today.keys:[],0);
+  if(td>=add(FINAL,-2)&&r.lm>0)return'over';
+  if(td>FINAL&&r.lr>0)return'rev';
+  return 0;
+}
+function rollover(){
+  const td=today(),p=S.today;
+  if(p.date){S.hist[p.date]=p.keys;p.keys.forEach(k=>{if(k[0]!='Q'&&!isDone(k))S.overdue.push(k)})}
+  S.overdue=[...new Set(S.overdue)].filter(k=>k[0]!='Q'&&!isDone(k));
+  const d0=sim(td,endD(),[],S.buf).out[td]||[];
+  S.today={date:td,keys:[...new Set(d0)]};
+}
+function replan(quiet){
+  const td=today(),done=S.today.keys.filter(isDone);
+  const keep=S.today.keys.filter(k=>k[0]=='P'&&byId[k.slice(2)]&&byId[k.slice(2)].cd==td);
+  const d0=sim(td,endD(),[],S.buf).out[td]||[];
+  S.today.keys=[...new Set([...done,...keep,...d0])];
+  upd();if(!quiet)toast('Today re-planned')
+}
+function refresh(){
+  const td=today();S.buf=calcBuf(td);
+  if(S.today.date!==td)rollover();
+  S.plan=sim(add(td,1),endD(),S.today.keys,S.buf);
+  save();
+}
+function upd(){touch();refresh();render()}
+function dayKeys(d){const td=today();return d<td?(S.hist[d]||[]):d==td?S.today.keys:(S.plan.out[d]||[])}
+
+// Smallest study-hours/day (up to 12) at which every subject meets its deadline.
+function needHrs(){
+  const td=today(),old=S.hrs;let res=null;
+  try{for(let h=old+.5;h<=12;h+=.5){S.hrs=h;const r=sim(add(td,1),FINAL,S.today.keys,0);
+    if(!r.left.size&&Object.keys(S.dl).every(g=>!r.fin[g]||r.fin[g]<=S.dl[g])){res=h;break}}}
+  finally{S.hrs=old}
+  return res;
+}
+
+// ---------- actions ----------
+const PYQ_MIN_H=5;
+function hoursLeft(){const n=new Date(),h=n.getHours()+n.getMinutes()/60;return h<5?0:Math.max(0,(S.dayEnd||24)-h)}
+function setF(id,f,v){
+  const x=byId[id],td=today(),was=x[f];x[f]=v;let offer=0,later=0;
+  if(f=='t'){if(v=='C'){x.cd=td;logD('T:'+id);
+    if(was!='C'&&x.p!='C'){if(hoursLeft()>=PYQ_MIN_H){if(!S.today.keys.includes('P:'+id))S.today.keys.push('P:'+id);offer=1}else later=1}}
+    else x.cd=null}
+  if(f=='p'&&v=='C')logD('P:'+id);
+  if(f=='r'&&v)logD('R:'+id);
+  S.overdue=S.overdue.filter(k=>!isDone(k));upd();
+  if(offer)offerP(id);else if(later)toast(x.n+' ✓ · PYQs queued for tomorrow (under '+PYQ_MIN_H+' h left today)');
+}
+function setDayEnd(v){S.dayEnd=Math.max(18,Math.min(24,+v||24));touch();save();render()}
+function cyc(id,f){const o=['N','O','C'];setF(id,f,o[(o.indexOf(byId[id][f])+1)%3])}
+function markDone(k){
+  const ty=k[0],id=k.slice(2);
+  if(ty=='Q'){S.qft[id]=1;logD(k);upd();return toast('QFT block done ✓')}
+  setF(id,ty=='T'?'t':ty=='P'?'p':'r',ty=='R'?true:'C');
+  if(!(ty=='T'&&byId[id].p!='C'))toast(byId[id].n+' ✓');
+}
+// ---------- anti-drift lock (no timer) ----------
+let FK=null,HA=null,HT=0;
+function openF(k){
+  const ty=k[0],q=ty=='Q',x=q?null:byId[k.slice(2)],e=q?ev(k.slice(2),S.buf):null;
+  if(q?!e:!x)return;
+  FK=k;nxHide();
+  $('ft').textContent=q?'Quizr Full Test '+e[1]+(e[0]=='p'?' · Pre-test revision':' + error audit'):x.n;
+  $('fb').textContent=q?'QFT':{T:'01 · Theory block',P:'02 · MUST DO PYQs',R:'03 · Revision sweep'}[ty];
+  $('fs').textContent=q?(e[0]=='p'?'6-hour formula & mistake sweep':'3h mock + 2h audit'):{T:'Notes, derivations, standard examples.',P:'Timed JEE PYQs, zero distractions.',R:'Active recall of formulas & mistakes.'}[ty];
+  $('fi').textContent=q?'QFT':SN[x.s].toUpperCase();
+  const nx=S.today.keys.find(z=>z!=k&&z[0]!='Q'&&!isDone(z));
+  $('fh').textContent=nx?'Next after this: '+byId[nx.slice(2)].n+' ('+{T:'Theory',P:'PYQs',R:'Revision'}[nx[0]]+')':'Last item on today’s list';
+  $('fo').classList.add('on');
+  try{localStorage.setItem(KEY+'_lock',k)}catch(_){}
+}
+function closeF(){cancelHold();FK=null;$('fo').classList.remove('on');try{localStorage.removeItem(KEY+'_lock')}catch(_){}}
+function finishF(){const k=FK;if(!k)return;closeF();markDone(k)}
+$('hold').addEventListener('pointerdown',e=>{cancelHold();HT=performance.now();const st=n=>{const el=n-HT;$('hp').style.width=Math.min(100,el/70)+'%';$('hl').textContent='Keep holding… '+Math.max(0,Math.ceil((7000-el)/1000))+'s';if(el>=7000){closeF();toast('Exited focus lock');return}HA=requestAnimationFrame(st)};HA=requestAnimationFrame(st)});
+['pointerup','pointerleave','pointercancel'].forEach(t=>$('hold').addEventListener(t,cancelHold));
+function cancelHold(){if(HA)cancelAnimationFrame(HA);HA=null;$('hp').style.width=0;$('hl').textContent='Hold 7s to exit lock'}
+let NX=null;function offerP(id){NX=id;$('nxt').textContent=byId[id].n;$('nx').classList.remove('hide')}
+function nxHide(){$('nx').classList.add('hide')}
+function nxGo(){nxHide();if(NX)openF('P:'+NX)}
+function undo(k){
+  const ty=k[0],id=k.slice(2),td=today();
+  if(ty=='Q')delete S.qft[id];
+  else{const x=byId[id];
+    if(ty=='T'){x.t='O';x.cd=null;if(x.p!='C')S.today.keys=S.today.keys.filter(z=>z!='P:'+id)}
+    if(ty=='P')x.p='O';
+    if(ty=='R')x.r=false}
+  if(S.log[td])S.log[td]=S.log[td].filter(z=>z!=k);
+  upd();toast('Undone');
+}
+function pull(ty){
+  const have=new Set(S.today.keys);
+  const pool=C.filter(x=>(ty=='T'?x.t!='C':ty=='P'?(x.t=='C'&&x.p!='C'):(x.t=='C'&&!x.r))&&!have.has(ty+':'+x.id)).sort((a,b)=>cmpA([S.hw&&HW.has(a.n)?0:1,ty=='R'?(a.cd||''):S.dl[a.g],C.indexOf(a)],[S.hw&&HW.has(b.n)?0:1,ty=='R'?(b.cd||''):S.dl[b.g],C.indexOf(b)]));
+  if(!pool.length)return toast('Nothing more to pull');
+  S.today.keys.push(ty+':'+pool[0].id);upd();toast('Added '+pool[0].n);
+}
+function togHW(){S.hw=S.hw?0:1;replan(1);toast(S.hw?'High-Weightage First ON':'High-Weightage First OFF')}
+function setHrs(v){S.hrs=Math.max(3,Math.min(12,+v||8));replan(1)}
+function setDl(g,v){if(v){S.dl[g]=v;replan(1)}else render()}
+let rsT=0;function resetAll(){if(!rsT){rsT=1;$('rs').textContent='Tap again to confirm';setTimeout(()=>{rsT=0;$('rs').textContent='Reset baseline'},3000);return}try{localStorage.removeItem(KEY);localStorage.removeItem(KEY+'_prev')}catch(e){}location.reload()}
+
+// ---------- Gemini sync line ----------
+function copyText(t,ok,fail){
+  const fb=()=>{const ta=document.createElement('textarea');ta.value=t;ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.select();let r=false;try{r=document.execCommand('copy')}catch(e){}ta.remove();return r};
+  const bad=()=>{if(fb())toast(ok);else{toast('Copy blocked — select and copy manually');if(fail)fail()}};
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(()=>toast(ok),bad);else bad();
+}
+function syncLine(){
+  const td=today(),K=S.today.keys.filter(k=>k[0]!='Q');
+  const nm=k=>byId[k.slice(2)].n+(S.overdue.includes(k)&&!isDone(k)?' (overdue)':'');
+  const grp=L=>['T','P','R'].map(ty=>{const a=L.filter(k=>k[0]==ty).map(nm);return a.length?{T:'Theory',P:'PYQs',R:'Revision'}[ty]+': '+a.join(', '):''}).filter(Boolean).join('; ');
+  const dn=K.filter(isDone),pd=K.filter(k=>!isDone(k)),v=z=>z===''||z==null?'-':z,p=[];
+  p.push('JEE 2027 SYNC '+fmt(td)+' · Day '+(dif(START,td)+1)+'/'+(dif(START,endD())+1)+' · '+Math.max(0,dif(td,FINAL))+' days to '+md(FINAL)+' · plan '+S.hrs+'h/day'+(S.hw?' · High-Weightage-first ON':'')+(S.buf?' · buffer to '+md(BUFEND)+' active':''));
+  p.push('TODAY '+dn.length+'/'+K.length+' done'+(dn.length?' → '+grp(dn):''));
+  if(pd.length)p.push('PENDING → '+grp(pd));
+  const e=ev(td,S.buf);if(e)p.push('QFT-'+e[1]+' '+(e[0]=='p'?'revision day':'test day')+': '+(S.qft[td]?'done':'pending'));
+  p.push('OVERALL closed '+C.filter(x=>x.t=='C'&&x.p=='C').length+'/'+C.length+' (theory+PYQs), theory '+C.filter(x=>x.t=='C').length+'/'+C.length+', revised '+C.filter(x=>x.r).length+'/'+C.length);
+  p.push('SUBJECTS '+Object.keys(GN).map(g=>{const s=gstat(g);return GN[g]+' '+s.done+'/'+s.L.length+(s.pend?(s.ok?' on track':' BEHIND')+' (proj '+s.proj+', deadline '+md(s.dl)+')':' complete')}).join('; '));
+  const nx=add(td,1);
+  if(nx<=endD()){const nk=S.plan.out[nx]||[],q=ev(nx,S.buf);p.push('NEXT '+fmt(nx)+' → '+(grp(nk.filter(k=>k[0]!='Q'))||'nothing scheduled')+(q?' + QFT-'+q[1]+' '+(q[0]=='p'?'revision':'test'):''))}
+  const sc=Object.keys(S.sc).filter(n=>['p','c','m'].some(k=>S.sc[n]&&S.sc[n][k]!==undefined&&S.sc[n][k]!=='')).map(n=>{const s=S.sc[n];return 'QFT-'+n+' '+((+s.p||0)+(+s.c||0)+(+s.m||0))+'/300 (P'+v(s.p)+' C'+v(s.c)+' M'+v(s.m)+')'});
+  if(sc.length)p.push('SCORES '+sc.join('; '));
+  return p.join(' | ');
+}
+function copySync(){const l=syncLine();copyText(l,'Gemini sync line copied',()=>{const t=$('sl');t.value=l;t.classList.remove('hide');t.select()})}
+
+// ---------- export / import ----------
+function dl(name,text,mime){const b=new Blob([text],{type:mime}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000)}
+function markExp(){S.lastExport=today();save()}
+function expJSON(){markExp();dl('jee27-batcave-'+today()+'.json',JSON.stringify(snap()),'application/json');toast('Backup (.json) downloaded');render()}
+function expHTML(){
+  const re=new RegExp('(<script id="seed"[^>]*>)[\\s\\S]*?(</scr'+'ipt>)');
+  if(!re.test(SRC)){toast('HTML export not available here — use .json instead');return}
+  markExp();
+  const seed=JSON.stringify(snap()).replace(/</g,'\\u003c');
+  dl('JEE-2027-Batcave-'+today()+'.html',SRC.replace(re,(m,a,b)=>a+seed+b),'text/html');
+  toast('HTML copy downloaded — open it on any device');render();
+}
+function expCSV(){
+  markExp();
+  const q=s=>'"'+String(s).replace(/"/g,'""')+'"',rows=[['Subject','Chapter','Theory','PYQs','Revised','Theory closed on']];
+  C.forEach(x=>rows.push([SN[x.s],x.n,ST[x.t],ST[x.p],x.r?'Yes':'No',x.cd||'']));
+  dl('jee27-syllabus-'+today()+'.csv','\ufeff'+rows.map(r=>r.map(q).join(',')).join('\r\n'),'text/csv;charset=utf-8');
+  toast('Excel file (.csv) downloaded');render();
+}
+function parseCSV(t){
+  t=t.replace(/^\ufeff/,'');const first=t.split(/\r?\n/)[0]||'',dm=first.includes(';')&&!first.includes(',')?';':',';
+  const rows=[];let r=[],f='',q=0;
+  for(let i=0;i<t.length;i++){const c=t[i];
+    if(q){if(c=='"'){if(t[i+1]=='"'){f+='"';i++}else q=0}else f+=c}
+    else if(c=='"')q=1;
+    else if(c==dm){r.push(f);f=''}
+    else if(c=='\n'||c=='\r'){if(c=='\r'&&t[i+1]=='\n')i++;r.push(f);f='';if(r.some(z=>z.trim()!==''))rows.push(r);r=[]}
+    else f+=c}
+  r.push(f);if(r.some(z=>z.trim()!==''))rows.push(r);
+  return rows;
+}
+function impCSV(t){
+  const rows=parseCSV(t);if(rows.length<2)throw new Error('empty');
+  const h=rows[0].map(z=>z.trim().toLowerCase()),ci=h.indexOf('chapter');
+  const ti=h.findIndex(z=>z.startsWith('theory')&&!z.includes('closed')),pi=h.findIndex(z=>z.startsWith('pyq')),ri=h.findIndex(z=>z.startsWith('revis')),di=h.findIndex(z=>z.includes('closed'));
+  if(ci<0||(ti<0&&pi<0&&ri<0))throw new Error('columns');
+  const nz=s=>String(s||'').toLowerCase().replace(/\s+/g,' ').trim(),map=new Map(C.map(x=>[nz(x.n),x]));
+  const stt=s=>{s=nz(s);return s[0]=='c'||s=='done'?'C':(s[0]=='o'||s.startsWith('in'))?'O':'N'};
+  const yes=s=>['y','yes','true','1','✓','x','revised'].includes(nz(s));
+  const upd1=[];let hit=0;
+  rows.slice(1).forEach(r=>{const x=map.get(nz(r[ci]));if(!x)return;hit++;
+    upd1.push([x,ti>=0?stt(r[ti]):x.t,pi>=0?stt(r[pi]):x.p,ri>=0?yes(r[ri]):x.r,di>=0&&isDate((r[di]||'').trim())?r[di].trim():x.cd])});
+  if(!hit)throw new Error('nomatch');
+  stash();
+  upd1.forEach(([x,t,p,rv,cd])=>{x.t=t;x.p=p;x.r=rv;x.cd=t=='C'?cd:null});
+  S.overdue=S.overdue.filter(k=>!isDone(k));
+  upd();toast('Excel file imported · '+hit+' chapters matched');
+}
+function stash(){try{localStorage.setItem(KEY+'_prev',JSON.stringify(snap()))}catch(e){}}
+function hasPrev(){try{return !!localStorage.getItem(KEY+'_prev')}catch(e){return false}}
+function undoImport(){try{const r=JSON.parse(localStorage.getItem(KEY+'_prev'));localStorage.removeItem(KEY+'_prev');adopt(r);upd();toast('Import undone')}catch(e){toast('Nothing to undo')}}
+function impJSON(r){
+  if(!r||typeof r!='object'||!r.ch||typeof r.ch!='object')throw new Error('bad');
+  stash();adopt(r);upd();toast('Progress imported ✓');
+}
+function importText(t){
+  t=t.replace(/^\ufeff/,'');const s=t.trimStart();
+  if(s[0]=='{')return impJSON(JSON.parse(t));
+  if(/<html|<!doctype/i.test(s.slice(0,400))){
+    const m=t.match(/<script[^>]*id=["']seed["'][^>]*>([\s\S]*?)<\/script>/i),j=m?m[1].trim():'';
+    if(!j||j=='null')return toast('That HTML file has no saved progress inside it');
+    return impJSON(JSON.parse(j));
+  }
+  impCSV(t);
+}
+function impFile(inp){
+  const f=inp.files&&inp.files[0];if(!f)return;
+  const rd=new FileReader();
+  rd.onload=()=>{try{importText(String(rd.result))}catch(e){toast('Could not read that file — use a Batcave .html, .json or .csv export')}inp.value=''};
+  rd.onerror=()=>{toast('Could not read that file');inp.value=''};
+  rd.readAsText(f);
+}
+function bkCopy(){const ta=$('bk');ta.value=JSON.stringify(snap());ta.select();copyText(ta.value,'Backup text copied')}
+function bkRestore(){try{importText($('bk').value.trim())}catch(e){toast('Invalid backup text')}}
+
+// ---------- render ----------
+function go(v){UI.view=v;['today','road','syl'].forEach(n=>{$('v-'+n).classList.toggle('hide',n!=v);$('n-'+n).className=n==v?'on':''});render();scrollTo(0,0)}
+function crd(k){
+  const x=byId[k.slice(2)],ty=k[0],dn=isDone(k),od=S.overdue.includes(k),td=today();
+  const L={T:'Theory',P:'PYQs',R:'Revision'}[ty],D={T:'Theory done ✓',P:'PYQs done ✓',R:'Revised ✓'};
+  const fresh=ty=='P'&&x.cd==td&&!dn;
+  const sub=ty=='T'?'Theory: '+ST[x.t]:ty=='P'?'PYQs: '+ST[x.p]:(x.cd?'+3d closure sweep':'Pre-studied backlog');
+  return `<div class="card ${HW.has(x.n)?'hw':''}"><div class="row"><span class="chip ${x.s}">${SN[x.s]}</span><span>${od&&!dn?'<b class="ov">OVERDUE</b>':''}${fresh?'<b class="hwt" style="color:#6ee7b7;border-color:#10b98166;background:#10b9811f">Theory ✓</b>':''}${HW.has(x.n)?'<b class="hwt">HW</b>':''}</span></div><h3 class="${dn?'dn':''}">${x.n}</h3><small>${GN[x.g]} · ${sub}</small>${dn?`<div class="ok">${D[ty]}<button class="und" onclick="undo('${k}')">undo</button></div>`:`<div class="row" style="margin-top:8px;flex-wrap:nowrap"><button class="btn ${ty=='P'?'g':ty=='R'?'i':''}" style="margin:0;flex:1" onclick="openF('${k}')">Start ${L}</button><button class="und" style="margin:0" onclick="markDone('${k}')">✓ done</button></div>`}</div>`;
+}
+function gstat(g){
+  const L=C.filter(x=>x.g==g),td=today(),done=L.filter(x=>x.t=='C'&&x.p=='C').length,pend=L.length-done;
+  const inT=S.today.keys.some(k=>'TP'.includes(k[0])&&byId[k.slice(2)]&&byId[k.slice(2)].g==g&&!isDone(k));
+  const left=S.plan.left.has(g);
+  const f=[S.plan.fin[g]||'',inT?td:''].sort().pop();
+  return{L,done,pend,proj:pend?(left?'beyond '+fmt(endD()):fmt(f||td)):'Done',ok:!pend||(!left&&f<=S.dl[g]),dl:S.dl[g]};
+}
+function renderHead(){
+  const td=today();$('hdate').textContent=fmt(td)+', 2026';
+  const b=$('hbuf');b.textContent=S.buf=='over'?'Buffer · Dec 20':S.buf=='rev'?'Rev buffer · Dec 20':'Auto-plan';b.style.color=S.buf?'var(--am)':'';
+  document.body.classList.toggle('hwm',!!S.hw);
+  $('hwb').className='pill'+(S.hw?' on':'');$('hwb').textContent='High-Weightage First: '+(S.hw?'ON':'OFF');
+}
+function renderToday(){
+  const td=today(),K=S.today.keys,bn=[];
+  if(S.buf=='over')bn.push('<div class="ban amb"><b>BUFFER OPEN</b> · Dec 16–20 reserve activated with QFT-4 (Dec 16 revision, Dec 17 test). Remaining chapters no longer fit by Dec 15; every view is re-planned.</div>');
+  if(S.buf=='rev')bn.push('<div class="ban amb"><b>REVISION BUFFER</b> · Syllabus closed; Dec 16–20 holds late +3d revision sweeps.</div>');
+  const od=S.overdue.filter(k=>!isDone(k)&&K.includes(k));
+  if(od.length)bn.push('<div class="ban red"><b>OVERDUE · '+od.length+'</b> carried into today: '+od.map(k=>byId[k.slice(2)].n+' ('+{T:'Theory',P:'PYQs',R:'Rev'}[k[0]]+')').join(' · ')+'</div>');
+  if(S.hw){const h=C.filter(x=>HW.has(x.n));bn.push('<div class="ban red"><b>HIGH-WEIGHTAGE FIRST</b> · '+h.filter(x=>x.t=='C'&&x.p=='C').length+'/'+h.length+' HW chapters exam-ready. HW chapters are scheduled first; subjects close to missing their deadline are still protected.</div>')}
+  const gs=Object.keys(GN).map(g=>[g,gstat(g)]),behind=gs.filter(([g,s])=>s.pend&&!s.ok);
+  if(behind.length&&td<=FINAL){const h=needHrs();
+    bn.push('<div class="ban red"><b>BEHIND · '+behind.map(([g])=>GN[g]).join(', ')+'</b> — '+(h?'about <b>'+h+' h/day</b> (now '+S.hrs+') gets every subject home by its deadline. Change it in Settings.':'even 12 h/day cannot hit every deadline. Move a deadline in Settings or lean on the Dec 16–20 buffer.')+'</div>')}
+  if(S.ts>0&&(!S.lastExport||dif(S.lastExport,td)>=3))bn.push('<div class="ban pur"><b>BACKUP</b> · last export: '+(S.lastExport?dif(S.lastExport,td)+' days ago':'never')+'. Browsers can clear site data, so export a copy. <button class="und" onclick="expHTML()">Export HTML</button><button class="und" onclick="expCSV()">Export Excel</button></div>');
+  if(K.length&&K.every(isDone)&&td<=endD())bn.push('<div class="ban pur"><b>TODAY CLEARED ✓</b> · '+(hoursLeft()>=2?'still time: pull more with the “+” buttons, or call it a day.':'good work. Rest, then check tomorrow on the Roadmap.')+'</div>');
+  $('banners').innerHTML=bn.join('');
+  const days=dif(START,endD())+1,rt=C.filter(x=>x.t!='C').length,rp=C.filter(x=>x.p!='C').length,dlft=Math.max(1,dif(td,FINAL)+1);
+  $('dpill').textContent='Day '+(dif(START,td)+1)+' / '+days+' · '+fmt(td);
+  $('stat').textContent=C.filter(x=>x.t=='C'&&x.p=='C').length+'/'+C.length+' closed · '+C.filter(x=>x.r).length+' revised · '+(td<=FINAL?(rt/dlft).toFixed(1)+' T/d · '+(rp/dlft).toFixed(1)+' PYQ/d':'post-sprint');
+  const sj=[...new Set(K.filter(k=>'TP'.includes(k[0])).map(k=>SN[byId[k.slice(2)].s]))].join(' + ');
+  $('subj').textContent='Today: '+(sj||'revision / rest');
+  const dn=K.filter(isDone).length,pc=K.length?Math.round(dn/K.length*100):100;
+  $('ptxt').textContent=dn+' / '+K.length+' done ('+pc+'%)';$('pbar').style.width=pc+'%';
+  $('dl').innerHTML=gs.map(([g,s])=>`<div class="card"><div class="row"><b>${GN[g]}</b><span class="chip ${s.pend==0?'C':s.ok?'P':'M'}" style="${s.pend&&!s.ok?'color:#fda4af;border-color:#f43f5e66':''}">${s.pend==0?'COMPLETE':s.ok?'ON TRACK':'BEHIND'}</span></div><div class="proj">Projected finish <b class="${s.ok?'okc':'bad'}">${s.proj}</b></div><label class="dlc">Deadline <u>${fmt(s.dl)}</u> ✎<input type="date" value="${s.dl}" min="${START}" onchange="setDl('${g}',this.value)"></label><div class="bar" style="margin:8px 0 4px"><i style="width:${Math.round(s.done/s.L.length*100)}%"></i></div><small>${s.done}/${s.L.length} exam-ready · ${s.pend} left</small></div>`).join('');
+  const e=ev(td,S.buf);
+  $('qft').innerHTML=e?`<div class="ban pur" style="display:flex;justify-content:space-between;align-items:center;gap:8px"><div><b>QFT-${e[1]} ${e[0]=='p'?'Revision Day · 25% load':'Test Day · 35% load'}</b><br><small>${e[0]=='p'?'6-hour formula & mistake sweep':'3h mock + 2h error audit'}</small></div>${S.qft[td]?`<span><b>✓ done</b><button class="und" onclick="undo('Q:${td}')">undo</button></span>`:`<span style="display:flex;gap:6px;align-items:center"><button class="btn" style="width:auto;margin:0;background:var(--pu)" onclick="openF('Q:${td}')">Enter lock</button><button class="und" style="margin:0" onclick="markDone('Q:${td}')">✓ done</button></span>`}</div>`:'';
+  const sec=(ty,id,msg)=>{const hq=k=>HW.has(byId[k.slice(2)].n)?0:1;const ks=K.filter(k=>k[0]==ty).sort((a,b)=>isDone(a)-isDone(b)||(S.hw?hq(a)-hq(b):0));$(id).innerHTML=ks.length?ks.map(crd).join(''):`<div class="card"><small>${msg}</small></div>`};
+  sec('T','gT','No theory queued today. Use “+ Next chapter” if you have bandwidth.');
+  sec('P','gP','No PYQ sets queued. Completing a chapter’s theory unlocks its PYQs here.');
+  sec('R','gR','Revision sweep is clear today.');
+  const tl=rt,pl=rp,rd=C.filter(x=>x.t=='C'&&!x.r).length;
+  $('kp').innerHTML=[['Days to '+md(FINAL),Math.max(0,dif(td,FINAL))],['Theory left',tl],['PYQ sets left',pl],['To revise',rd]].map(([a,b])=>`<div class="card"><small>${a}</small><div class="kv">${b}</div></div>`).join('');
+  $('hrs').value=S.hrs;$('dend').value=S.dayEnd;
+  $('dls').innerHTML=Object.keys(GN).map(g=>`<div class="row"><small>${GN[g]} deadline</small><input type="date" value="${S.dl[g]}" min="${START}" onchange="setDl('${g}',this.value)"></div>`).join('');
+  $('lx').textContent='Last export: '+(S.lastExport?fmt(S.lastExport):'never');
+  $('uib').classList.toggle('hide',!hasPrev());
+}
+function dayHtml(d){
+  const ks=dayKeys(d),td=today(),past=d<td,q=ev(d,S.buf);
+  const dn=k=>past?(S.log[d]||[]).includes(k):isDone(k);
+  const by=ty=>ks.filter(k=>k[0]==ty).map(k=>`<div>${dn(k)?'✓ ':'• '}${byId[k.slice(2)].n}</div>`).join('')||'<small>—</small>';
+  const tot=ks.length,dd=ks.filter(dn).length,rt=(past||d==td)&&tot?Math.round(dd/tot*10):null;
+  return{q,rt,tot,html:`<p class="T"><small>THEORY</small>${by('T')}</p><p class="Pp"><small>MUST DO PYQs</small>${by('P')}</p><p class="R"><small>REVISION (${ks.filter(k=>k[0]=='R').length})</small>${by('R')}</p>`};
+}
+function dates(){const a=[];for(let d=START;d<=endD();d=add(d,1))a.push(d);return a}
+function selDay(d){S.sel=d;renderRoad()}
+function renderRoad(){
+  const D=dates(),td=today();if(!S.sel||!D.includes(S.sel))S.sel=D.includes(td)?td:D[D.length-1];
+  if(UI.view=='road')drawRoad(D,td);
+  const v=dayHtml(S.sel);
+  $('pv').innerHTML=`<div class="row"><b>${fmt(S.sel)} · Day ${dif(START,S.sel)+1}</b>${v.q?`<span class="chip M" style="color:var(--pu)">QFT-${v.q[1]} ${v.q[0]=='p'?'REV':'TEST'}</span>`:''}${v.rt!==null?`<span class="chip P">${v.rt}/10</span>`:''}</div>${v.html}`;
+  $('cards').innerHTML=D.map(d=>{const v=dayHtml(d);return `<div class="card day ${d==S.sel?'sel':''} ${d<td?'pastd':''} ${v.q?'q':''} ${d>FINAL?'buf':''}" onclick="selDay('${d}')"><div class="row"><b>${fmt(d)} <small>Day ${dif(START,d)+1}${d==td?' · TODAY':''}${d>FINAL?' · BUFFER':''}</small></b><span>${v.q?`<span class="chip M" style="color:var(--pu)">QFT-${v.q[1]} ${v.q[0]=='p'?'REV 25%':'TEST 35%'}</span> `:''}${v.rt!==null?`<span class="chip P">${v.rt}/10</span>`:'<small>scheduled</small>'}</span></div>${v.html}</div>`}).join('');
+}
+function renderSyl(){
+  const N=C.length,er=C.filter(x=>x.t=='C'&&x.p=='C').length,td=C.filter(x=>x.t=='C').length,rv=C.filter(x=>x.r).length;
+  $('mst').textContent=er+' Exam Ready · '+td+' Theory Done · '+rv+' Revised (of '+N+')';
+  $('b1').style.width=er/N*100+'%';$('b2').style.width=(td-er)/N*100+'%';
+  $('stabs').innerHTML=[['P','Physics'],['C','Chemistry'],['M','Maths']].map(([s,n])=>`<button class="pill ${UI.sub==s?'on':''}" onclick="UI.sub='${s}';renderSyl()">${n} (${C.filter(x=>x.s==s).length})</button>`).join('');
+  const F=[['All','All'],['HW','High-Weightage ('+HW.size+')'],['PYQ','Theory Done → PYQ Pending'],['UR','Not Revised'],['RV','Revised ✓'],['ER','Exam Ready']];
+  $('chips').innerHTML=F.map(([k,n])=>`<button class="pill ${UI.filt==k?'on':''}" onclick="UI.filt='${k}';renderSyl()">${n}</button>`).join('');
+  const q=$('q').value.trim().toLowerCase();
+  const R=C.filter(x=>x.s==UI.sub&&(!q||x.n.toLowerCase().includes(q))&&({All:1,HW:HW.has(x.n),PYQ:x.t=='C'&&x.p!='C',UR:!x.r,RV:x.r,ER:x.t=='C'&&x.p=='C'})[UI.filt]);
+  $('tb').innerHTML=R.length?R.map(x=>`<tr><td>${x.n}${HW.has(x.n)?' <b class="hwt">HW</b>':''}<br><small>${GN[x.g]}</small></td><td><button class="pill ${x.t=='C'?'C2':x.t}" onclick="cyc('${x.id}','t')">${ST[x.t]}</button></td><td><button class="pill ${x.p=='C'?'C2':x.p}" onclick="cyc('${x.id}','p')">${ST[x.p]}</button></td><td><button class="pill ${x.r?'rv':''}" onclick="setF('${x.id}','r',${!x.r})">${x.r?'Revised ✓':'Not Revised'}</button></td></tr>`).join(''):'<tr><td colspan="4"><small>No chapters match.</small></td></tr>';
+}
+function render(){renderHead();renderToday();renderRoad();renderSyl();['dl2','dl3'].forEach(i=>$(i).innerHTML=$('dl').innerHTML);renderExtras()}
+const RD='M40 190 C200 60 330 230 500 130 C670 30 800 210 960 70';
+function ptAtX(el,len,tx){let lo=0,hi=len;for(let i=0;i<18;i++){const m=(lo+hi)/2;if(el.getPointAtLength(m).x<tx)lo=m;else hi=m}const l=(lo+hi)/2;return{p:el.getPointAtLength(l),l}}
+function buildRoad(){
+  const p=(w,c,x='')=>`<path d="${RD}" fill="none" stroke="${c}" stroke-width="${w}" stroke-linecap="round" ${x}/>`;
+  const svg=$('hw');
+  svg.innerHTML='<defs><filter id="gl" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="3.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>'+p(54,'#020305')+p(42,'#38455c')+`<path id="rb" d="${RD}" fill="none" stroke="#0e1422" stroke-width="34" stroke-linecap="round"/>`+p(2,'#e2e8f0','stroke-opacity=".45" stroke-dasharray="12 12"')+`<path id="tr" d="${RD}" fill="none" stroke="var(--a)" stroke-width="4" stroke-linecap="round" filter="url(#gl)"/><g id="nodes"></g>`;
+  let drag=0;
+  const scrub=x=>{const D=dates(),r=svg.getBoundingClientRect();if(!r.width)return;const sx=Math.max(40,Math.min(960,(x-r.left)/r.width*1000));const i=Math.round((sx-40)/920*(D.length-1));if(D[i]!==S.sel){S.sel=D[i];renderRoad()}};
+  svg.addEventListener('pointerdown',e=>{drag=1;try{svg.setPointerCapture(e.pointerId)}catch(_){}scrub(e.clientX)});
+  svg.addEventListener('pointermove',e=>{if(drag)scrub(e.clientX)});
+  ['pointerup','pointercancel'].forEach(t=>svg.addEventListener(t,()=>{drag=0}));
+}
+function drawRoad(D,td){
+  const el=$('rb');if(!el)return;const len=el.getTotalLength(),n=D.length;
+  const fl={};Object.keys(S.dl).forEach(g=>{(fl[S.dl[g]]=fl[S.dl[g]]||[]).push(GN[g].slice(0,3).toUpperCase())});
+  let h='',ap={x:40,y:190},al=0;
+  D.forEach((d,i)=>{
+    const{p,l}=ptAtX(el,len,40+(n>1?i/(n-1):0)*920),q=ev(d,S.buf),isT=d==td,x=p.x.toFixed(1),y=p.y.toFixed(1);
+    if(d==S.sel){ap=p;al=l}
+    let c=q?(q[0]=='t'?`<circle cx="${x}" cy="${y}" r="10" fill="#c084fc33"/><circle cx="${x}" cy="${y}" r="6" fill="#c084fc" stroke="#050608" stroke-width="2"/><text x="${x}" y="${(p.y-15).toFixed(1)}" text-anchor="middle" fill="#e9d5ff" font-size="10" font-weight="700" font-family="monospace">QFT-${q[1]}</text>`:`<circle cx="${x}" cy="${y}" r="3.8" fill="#090b10" stroke="#c084fc" stroke-width="2"/>`):`<circle cx="${x}" cy="${y}" r="${isT?5:3.2}" fill="${isT?'var(--a)':d<td?'#34d399':d>FINAL?'#fbbf24':'#64748b'}" stroke="#050608" stroke-width="1.5"/>`;
+    const lb=fl[d]?'⚑ '+fl[d].join('/'):(i==0?'DAY 1':isT?'TODAY':i==n-1?d.slice(5).replace('-','/'):'');
+    if(lb)c+=`<text x="${x}" y="${(p.y+(fl[d]?30:25)).toFixed(1)}" text-anchor="middle" fill="${fl[d]?'#fbbf24':isT?'#38bdf8':'#94a3b8'}" font-size="10" font-weight="700" font-family="monospace">${lb}</text>`;
+    h+=c;
+  });
+  const ax=ap.x.toFixed(1),ay=ap.y.toFixed(1);
+  h+=`<g pointer-events="none"><circle class="bc" cx="${ax}" cy="${ay}" r="14" fill="none" stroke="var(--a)" stroke-width="1.8"/><circle cx="${ax}" cy="${ay}" r="10" fill="#050608" stroke="var(--a)" stroke-width="3"/><circle cx="${ax}" cy="${ay}" r="4" fill="#fff"/></g>`;
+  $('nodes').innerHTML=h;
+  const tr=$('tr');tr.style.strokeDasharray=len;tr.style.strokeDashoffset=Math.max(0,len-al);
+}
+function setSc(n,k,v){S.sc[n]=S.sc[n]||{};S.sc[n][k]=v===''?'':Math.max(-25,Math.min(100,+v||0));touch();save();renderExtras()}
+function renderExtras(){
+  const ids=[1,2,3].concat(S.buf=='over'?[4]:[]),all={...QB,...QX},dOf=n=>Object.keys(all).find(k=>all[k][0]=='t'&&all[k][1]==n),tots=[];
+  const rows=ids.map(n=>{const s=S.sc[n]||{},has=['p','c','m'].some(k=>s[k]!==undefined&&s[k]!==''),t=(+s.p||0)+(+s.c||0)+(+s.m||0);if(has)tots.push(t);return `<div class="row" style="margin-top:8px"><small>QFT-${n} · ${fmt(dOf(n)).slice(5)}</small><span>`+['p','c','m'].map(k=>`<input type="number" inputmode="numeric" placeholder="${k.toUpperCase()}" value="${s[k]??''}" onchange="setSc(${n},'${k}',this.value)" style="width:62px;padding:4px">`).join(' ')+` <b class="mono" style="color:var(--pu)">${has?t:'—'}/300</b></span></div>`}).join('');
+  $('qs').innerHTML=`<div class="row"><b>QFT scoreboard</b><small>${tots.length?'latest '+tots[tots.length-1]+' · peak '+Math.max(...tots):'log P · C · M /100'}</small></div>${rows}`;
+}
+load();buildRoad();refresh();go('today');
+// Reopen the lock if the page was reloaded or closed while locked in.
+try{const lk=localStorage.getItem(KEY+'_lock');if(lk){if(okKey(lk)&&S.today.keys.includes(lk)&&!isDone(lk))openF(lk);else localStorage.removeItem(KEY+'_lock')}}catch(_){}
+</script></body></html>
