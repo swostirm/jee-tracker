@@ -90,7 +90,7 @@ hr{border:0;border-top:1px solid var(--b);margin:14px 0 10px}
 <h2><span>03 · Revision sweep</span><button class="pill" onclick="pull('R')">+ More revision</button></h2><div class="grid" id="gR"></div>
 
 <details><summary>⚙ Settings · Sync · Backup</summary><div class="card" style="margin-top:8px">
-<div class="row"><label>Study hours / day <input id="hrs" type="number" inputmode="decimal" min="3" max="14" step=".5" style="width:80px" onchange="setHrs(this.value)"></label></div>
+<div class="row"><label>Study hours / day <input id="hrs" type="number" inputmode="decimal" min="3" max="14" step=".5" style="width:80px" oninput="setHrs(this.value,1)" onchange="setHrs(this.value)"></label></div>
 <div class="row" style="margin-top:8px"><small>Study day ends at (hour, 24 = midnight)</small><input id="dend" type="number" inputmode="decimal" min="18" max="24" step=".5" style="width:80px" onchange="setDayEnd(this.value)"></div>
 <small style="display:block;margin-top:4px">When theory closes with 5 h or more left before this time, that chapter’s PYQ set is added to today and a start popup appears. Otherwise it is queued for tomorrow.</small>
 <div class="row" style="justify-content:flex-start;margin-top:8px"><small>Missed items spread over</small><select id="rec" onchange="setRec(this.value)" style="width:auto"><option value="1">today</option><option value="2">2 days</option><option value="3">3 days</option></select></div>
@@ -377,7 +377,7 @@ function pull(ty){
   S.today.keys.push(ty+':'+pool[0].id);upd();toast('Added '+pool[0].n);
 }
 function togHW(){S.hw=S.hw?0:1;replan(1);toast(S.hw?'High-Weightage First ON':'High-Weightage First OFF')}
-function setHrs(v){S.hrs=Math.max(3,Math.min(14,+v||14));replan(1)}
+function setHrs(v,live){const n=parseFloat(v);const h=isNaN(n)?S.hrs:Math.max(3,Math.min(14,n));if(!isNaN(n)&&n>14)toast('Maximum is 14 hours a day');S.hrs=h;if(live){save();return}replan(1);toast('Plan set to '+h+' h/day')}
 function setDl(g,v){if(v){S.dl[g]=v>BUFEND?BUFEND:v;replan(1)}else render()}
 let rsT=0;function resetAll(){if(!rsT){rsT=1;$('rs').textContent='Tap again to confirm';setTimeout(()=>{rsT=0;$('rs').textContent='Reset baseline'},3000);return}try{localStorage.removeItem(KEY);localStorage.removeItem(KEY+'_prev')}catch(e){}location.reload()}
 
@@ -531,7 +531,7 @@ function renderToday(){
   sec('T','gT','No theory queued today. Use “+ Next chapter” if you have bandwidth.');
   sec('P','gP','No PYQ sets queued. Completing a chapter’s theory unlocks its PYQs here.');
   sec('R','gR','Revision sweep is clear today.');
-  $('hrs').value=S.hrs;$('dend').value=S.dayEnd;$('rec').value=S.rec;
+if(document.activeElement!==$('hrs'))$('hrs').value=S.hrs;$('dend').value=S.dayEnd;$('rec').value=S.rec;
   $('lx').textContent='Last export: '+(S.lastExport?fmt(S.lastExport):'never');
   $('uib').classList.toggle('hide',!hasPrev());
 }
